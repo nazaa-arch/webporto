@@ -1,1091 +1,791 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import {
-  motion,
-  MotionConfig,
-  useScroll,
-  useTransform,
-  useInView,
-  animate,
-  type MotionValue,
-} from "motion/react";
+import { useState } from "react";
+import { motion } from "motion/react";
 import {
   ArrowRight,
   ArrowUpRight,
   Award,
-  Sparkles,
-  Layers,
-  ExternalLink,
-  Mail,
+  Check,
+  Copy,
   Linkedin,
   Github,
-  Palette,
-  Compass,
-  BarChart3,
-  CheckCircle2,
   Phone,
   Globe,
+  Trophy,
+  Briefcase,
+  Monitor,
+  Lightbulb,
 } from "lucide-react";
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+/* -------------------------------------------------------------------------- */
+/*                               SPOTLIGHT SVG                                */
+/* -------------------------------------------------------------------------- */
 
-/* ---------- Animation helpers ---------- */
+function Spotlight({ className, fill }: { className?: string; fill?: string }) {
+  return (
+    <svg
+      className={`pointer-events-none absolute z-[1] h-[169%] w-[138%] lg:w-[84%] opacity-0 animate-spotlight ${className}`}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 3787 2842"
+      fill="none"
+    >
+      <g filter="url(#spotlight-filter)">
+        <ellipse
+          cx="1924.71"
+          cy="273.501"
+          rx="1924.71"
+          ry="273.501"
+          transform="matrix(-0.822377 -0.568943 -0.568943 0.822377 3631.88 2291.09)"
+          fill={fill || "white"}
+          fillOpacity="0.21"
+        />
+      </g>
+      <defs>
+        <filter
+          id="spotlight-filter"
+          x="0.860352"
+          y="0.838989"
+          width="3785.16"
+          height="2840.26"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="151" result="effect1_foregroundBlur" />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
 
-function FadeUp({
-  children,
-  delay = 0,
-  className,
+/* -------------------------------------------------------------------------- */
+/*                                MAGIC BUTTON                                */
+/* -------------------------------------------------------------------------- */
+
+function MagicButton({
+  title,
+  icon,
+  position = "right",
+  handleClick,
+  otherClasses = "",
+  asLink,
+  href,
 }: {
-  children: ReactNode;
-  delay?: number;
-  className?: string;
+  title: string;
+  icon?: React.ReactNode;
+  position?: "left" | "right";
+  handleClick?: () => void;
+  otherClasses?: string;
+  asLink?: boolean;
+  href?: string;
 }) {
+  const content = (
+    <>
+      <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+      <span
+        className={`inline-flex h-full w-full cursor-pointer items-center justify-center rounded-lg bg-slate-950 px-7 text-sm font-medium text-white backdrop-blur-3xl gap-2 ${otherClasses}`}
+      >
+        {position === "left" && icon}
+        {title}
+        {position === "right" && icon}
+      </span>
+    </>
+  );
+
+  if (asLink && href) {
+    return (
+      <a
+        href={href}
+        target={href.startsWith("http") ? "_blank" : undefined}
+        rel="noreferrer"
+        className="relative inline-flex h-12 w-full md:w-60 overflow-hidden rounded-lg p-[1px] focus:outline-none"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className="relative inline-flex h-12 w-full md:w-60 overflow-hidden rounded-lg p-[1px] focus:outline-none"
+    >
+      {content}
+    </button>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               FLOATING NAVBAR                              */
+/* -------------------------------------------------------------------------- */
+
+function FloatingNav() {
+  const navItems = [
+    { name: "About", link: "#about" },
+    { name: "Projects", link: "#projects" },
+    { name: "Experience", link: "#experience" },
+    { name: "Approach", link: "#approach" },
+    { name: "Contact", link: "#contact" },
+  ];
+
   return (
     <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.8, ease: EASE, delay }}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex max-w-fit fixed z-[5000] top-8 inset-x-0 mx-auto px-8 py-3.5 rounded-full border border-white/[0.15] bg-black-200/80 shadow-[0px_2px_12px_rgba(0,0,0,0.5)] items-center justify-center space-x-6 backdrop-blur-md"
     >
-      {children}
+      <a href="#" className="flex items-center gap-2 pr-2 border-r border-white/10 group">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple/20 text-[11px] font-bold text-purple font-mono group-hover:scale-110 transition-transform">
+          NF
+        </span>
+        <span className="hidden sm:inline font-mono text-xs font-semibold text-white/90">
+          Naza.
+        </span>
+      </a>
+
+      {navItems.map((navItem, idx) => (
+        <a
+          key={`link-${idx}`}
+          href={navItem.link}
+          className="relative text-neutral-300 hover:text-white text-xs md:text-sm font-medium transition-colors cursor-pointer"
+        >
+          {navItem.name}
+        </a>
+      ))}
+
+      <a
+        href="mailto:firmannaza307@gmail.com"
+        className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-purple/40 bg-purple/10 px-3.5 py-1 text-xs font-medium text-purple hover:bg-purple/20 transition-colors"
+      >
+        <span>Hire Me</span>
+        <ArrowRight size={12} />
+      </a>
     </motion.div>
   );
 }
 
-function GrowLine({ className }: { className: string }) {
-  return (
-    <motion.div
-      className={`${className} origin-left`}
-      initial={{ scaleX: 0 }}
-      whileInView={{ scaleX: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.9, ease: EASE }}
-    />
-  );
-}
-
-function MaskLine({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
-  return (
-    <span className="block overflow-hidden py-[0.04em]">
-      <motion.span
-        className="block"
-        initial={{ y: "115%" }}
-        animate={{ y: 0 }}
-        transition={{ duration: 1, ease: EASE, delay }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-}
-
-function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
-  const [v, setV] = useState(0);
-  useEffect(() => {
-    if (!inView) return;
-    const controls = animate(0, to, {
-      duration: 1.6,
-      ease: "easeOut",
-      onUpdate: (l) => setV(Math.round(l)),
-    });
-    return () => controls.stop();
-  }, [inView, to]);
-  return (
-    <span ref={ref}>
-      {v}
-      {suffix}
-    </span>
-  );
-}
-
-function Word({
-  word,
-  progress,
-  range,
-  to,
-}: {
-  word: string;
-  progress: MotionValue<number>;
-  range: [number, number];
-  to: number;
-}) {
-  const opacity = useTransform(progress, range, [0.15, to]);
-  return (
-    <motion.span style={{ opacity }} className="mr-[0.25em] inline-block">
-      {word}
-    </motion.span>
-  );
-}
-
-/* ---------- Header ---------- */
-
-function Logo() {
-  return (
-    <a href="#" className="flex items-center gap-3 group">
-      <div className="relative flex h-9 w-9 items-center justify-center border border-foreground/20 bg-foreground/5 transition-colors group-hover:border-primary group-hover:bg-primary/10">
-        <span className="font-mono text-xs font-bold tracking-tighter text-foreground group-hover:text-primary">
-          NF
-        </span>
-        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary" />
-      </div>
-      <div className="flex flex-col">
-        <span className="text-sm font-semibold tracking-tight text-foreground uppercase">
-          Naza Firmansyah
-        </span>
-        <span className="text-[10px] text-foreground/40 font-mono tracking-wider uppercase">
-          UI/UX Designer
-        </span>
-      </div>
-    </a>
-  );
-}
-
-function Header() {
-  const links = [
-    { name: "Projects", href: "#projects" },
-    { name: "About", href: "#about" },
-    { name: "Awards", href: "#awards" },
-    { name: "Toolkit", href: "#toolkit" },
-    { name: "Contact", href: "#contact" },
-  ];
-
-  return (
-    <motion.header
-      className="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-foreground/10 bg-background/80 px-6 py-4 backdrop-blur-md md:px-16"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: EASE }}
-    >
-      <Logo />
-
-      <nav className="hidden items-center gap-8 md:flex">
-        {links.map((l) => (
-          <a
-            key={l.name}
-            href={l.href}
-            className="text-xs uppercase tracking-widest text-foreground/60 transition-colors hover:text-foreground"
-          >
-            {l.name}
-          </a>
-        ))}
-      </nav>
-
-      <div className="flex items-center gap-4">
-        <a
-          href="https://portofolionaza.steamcraft.online"
-          target="_blank"
-          rel="noreferrer"
-          className="hidden sm:inline-flex items-center gap-1.5 text-xs text-foreground/50 hover:text-primary transition-colors font-mono"
-        >
-          <span>steamcraft.online</span>
-          <ArrowUpRight size={12} />
-        </a>
-
-        <a
-          href="mailto:firmannaza307@gmail.com"
-          className="clip-corner bg-primary px-5 py-2 text-xs font-medium uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 flex items-center gap-2"
-        >
-          <span>Hire Me</span>
-          <ArrowRight size={14} />
-        </a>
-      </div>
-    </motion.header>
-  );
-}
-
-/* ---------- Hero Section ---------- */
+/* -------------------------------------------------------------------------- */
+/*                                HERO SECTION                                */
+/* -------------------------------------------------------------------------- */
 
 function Hero() {
-  const [activeTab, setActiveTab] = useState<"screen" | "system" | "research">("screen");
-
   return (
-    <section className="relative min-h-screen pt-28 pb-16 px-6 md:px-16 flex flex-col justify-between overflow-hidden border-b border-foreground/10">
-      {/* Background ambient grid & lighting */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(235,64,52,0.15),rgba(255,255,255,0))]" />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+    <div className="pb-20 pt-36 relative">
+      {/* Aceternity Spotlights */}
+      <div>
+        <Spotlight
+          className="-top-40 -left-10 md:-left-32 md:-top-20 h-screen"
+          fill="white"
+        />
+        <Spotlight
+          className="top-10 left-full h-[80vh] w-[50vw]"
+          fill="purple"
+        />
+        <Spotlight
+          className="top-28 left-80 h-[80vh] w-[50vw]"
+          fill="#3B82F6"
+        />
+      </div>
 
-      {/* Status Bar */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-foreground/10 pb-6 pt-4"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      >
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <p className="text-xs font-mono text-foreground/60">
-            Available for UI/UX &amp; Product Design
-          </p>
-        </div>
-        <p className="text-xs text-foreground/50 font-mono hidden md:block">
-          Sains Data UNESA • GPA 3.80/4.00
-        </p>
-        <p className="text-xs text-foreground/50 font-mono md:text-right">
-          Surabaya &amp; Sidoarjo, Indonesia
-        </p>
-      </motion.div>
+      {/* Grid Background with Radial Mask */}
+      <div className="h-screen w-full bg-black-100 bg-grid-white absolute top-0 left-0 flex items-center justify-center">
+        <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-black-100 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+      </div>
 
-      {/* Main Hero Headline & Interactive Showcase Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-12 md:py-16">
-        <div className="lg:col-span-7">
-          <div className="mb-4 inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary font-mono">
-            <Sparkles size={13} />
-            <span>UI/UX DESIGNER &amp; PRODUCT THINKER</span>
-          </div>
+      {/* Content Container */}
+      <div className="flex justify-center relative my-20 z-10">
+        <div className="max-w-[89vw] md:max-w-2xl lg:max-w-[60vw] flex flex-col items-center justify-center text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="uppercase tracking-widest text-xs text-center text-blue-100 max-w-80 font-mono mb-4"
+          >
+            DATA-DRIVEN UI/UX &amp; PRODUCT DESIGN
+          </motion.p>
 
-          <h1 className="text-[38px] sm:text-[54px] md:text-[68px] font-semibold leading-[0.98] tracking-tighter text-foreground">
-            <MaskLine delay={0.3}>MUHAMMAD NAZA</MaskLine>
-            <MaskLine delay={0.45}>
-              <span className="text-foreground/40 font-light">FIRMANSYAH.</span>
-            </MaskLine>
-          </h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-[40px] md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight"
+          >
+            Transforming Data &amp; Concepts into{" "}
+            <span className="text-purple">Intuitive User Experiences</span>
+          </motion.h1>
 
           <motion.p
-            className="mt-6 max-w-xl text-base md:text-lg text-foreground/70 leading-relaxed font-light"
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-center md:tracking-wider mb-8 text-sm md:text-lg lg:text-xl text-white-100 mt-5 max-w-2xl font-light"
           >
-            Memadukan presisi <span className="text-foreground font-normal">analisis data</span> dengan{" "}
-            <span className="text-foreground font-normal">human-centered design</span> untuk
-            merancang antarmuka produk digital yang intuitif, inklusif, dan berdampak nyata.
+            Hi! I'm <span className="text-white font-medium">Muhammad Naza Firmansyah</span>, a
+            passionate UI/UX Designer &amp; Data Science student at UNESA. Silver Medalist DIMAS TI &amp;
+            GEMASTIK XVIII Finalist.
           </motion.p>
 
           <motion.div
-            className="mt-8 flex flex-wrap items-center gap-4"
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.75 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex flex-col sm:flex-row items-center gap-4"
           >
-            <a
+            <MagicButton
+              title="Explore My Work"
+              icon={<ArrowRight size={16} />}
+              position="right"
+              asLink
               href="#projects"
-              className="clip-corner bg-foreground px-6 py-3 text-xs font-semibold uppercase tracking-wider text-background transition-colors hover:bg-primary hover:text-foreground flex items-center gap-2"
-            >
-              <span>Explore Projects</span>
-              <ArrowRight size={14} />
-            </a>
-
+            />
             <a
               href="https://linkedin.com/in/nazafirman"
               target="_blank"
               rel="noreferrer"
-              className="border border-foreground/20 px-5 py-3 text-xs font-mono uppercase tracking-wider text-foreground/80 hover:border-foreground hover:text-foreground transition-colors flex items-center gap-2"
+              className="inline-flex h-12 items-center justify-center rounded-lg border border-white/20 bg-black-200/80 px-6 text-sm font-medium text-white hover:border-purple hover:text-purple transition-colors gap-2"
             >
-              <Linkedin size={14} />
-              <span>LinkedIn</span>
+              <Linkedin size={16} />
+              <span>Connect on LinkedIn</span>
             </a>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
+/* -------------------------------------------------------------------------- */
+/*                                 BENTO GRID                                 */
+/* -------------------------------------------------------------------------- */
+
+function BentoGrid() {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText("firmannaza307@gmail.com");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
+
+  const leftLists = ["Figma", "FigJam", "Design Systems", "Prototyping"];
+  const rightLists = ["Usability Testing", "Python", "Data-Driven UX", "React/Tailwind"];
+
+  return (
+    <section id="about" className="py-20">
+      <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-5 md:grid-row-7 gap-4 lg:gap-8 mx-auto">
+        {/* Item 1: Large Card (Philosophy & ThisMe Mockup) */}
+        <div className="md:col-span-3 lg:col-span-3 md:row-span-2 relative overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-b from-[#0e122b] to-[#04071d] p-6 lg:p-8 flex flex-col justify-between">
+          <div className="z-20">
+            <span className="font-mono text-xs text-purple font-medium">DESIGN PHILOSOPHY</span>
+            <h3 className="font-bold text-lg md:text-2xl text-white mt-2 max-w-md">
+              I prioritize user-centered design, inclusive accessibility, and data-backed product decisions.
+            </h3>
+            <p className="text-white-100 text-xs md:text-sm mt-3 max-w-sm font-light">
+              Menjembatani presisi analisa data sains dengan estetika antarmuka modern untuk menghasilkan solusi digital yang terukur dan berdampak.
+            </p>
+          </div>
+
+          {/* Interactive Visual Element */}
+          <div className="mt-6 rounded-2xl border border-white/10 bg-black-100/70 p-4 backdrop-blur-md">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-mono text-xs text-white/80">ThisMe BISINDO Prototype</span>
+              </div>
+              <span className="text-[10px] font-mono text-purple bg-purple/10 px-2 py-0.5 rounded border border-purple/30">
+                Juara 2 DIMAS TI
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center text-xs">
+              <div className="rounded-lg border border-purple/40 bg-purple/10 p-2">
+                <div className="text-base">🤟</div>
+                <div className="text-[9px] font-mono text-white mt-1">30+ Screens</div>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-2">
+                <div className="text-base">🎯</div>
+                <div className="text-[9px] font-mono text-white mt-1">92.5 SUS Score</div>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-2">
+                <div className="text-base">♿</div>
+                <div className="text-[9px] font-mono text-white mt-1">WCAG 2.1</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Item 2: Location & Collaboration */}
+        <div className="md:col-span-3 lg:col-span-2 relative overflow-hidden rounded-3xl border border-white/[0.1] bg-[#04071D] p-6 lg:p-8 flex flex-col justify-between">
+          <div>
+            <span className="font-mono text-xs text-purple font-medium">LOCATION &amp; COLLABORATION</span>
+            <h3 className="font-bold text-lg md:text-xl text-white mt-2">
+              Flexible with remote team collaboration &amp; sprint workflows.
+            </h3>
+            <p className="text-white-100 text-xs mt-2 font-light">
+              Based in Surabaya &amp; Sidoarjo, Indonesia (GMT+7). Terbiasa berkolaborasi lintas disiplin tim software engineering.
+            </p>
+          </div>
+
+          <div className="mt-6 flex items-center gap-3 rounded-xl border border-white/10 bg-black-200/80 p-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple/20 text-purple">
+              <Globe size={20} />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-white">Universitas Negeri Surabaya</div>
+              <div className="text-[11px] font-mono text-white-100">Bachelor of Data Science (GPA 3.80)</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Item 3: Tech Stack Badge Columns */}
+        <div className="md:col-span-3 lg:col-span-2 relative overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-r from-[#04071D] to-[#0C0E23] p-6 lg:p-8 flex flex-col justify-between">
+          <div>
+            <span className="font-mono text-xs text-purple font-medium">MY TOOLKIT</span>
+            <h3 className="font-bold text-lg md:text-xl text-white mt-1">
+              Constantly refining my UI/UX &amp; data stack.
+            </h3>
+          </div>
+
+          <div className="flex gap-2 lg:gap-3 w-fit mt-4">
+            <div className="flex flex-col gap-2">
+              {leftLists.map((item, i) => (
+                <span
+                  key={i}
+                  className="py-1.5 px-3 text-[11px] font-mono opacity-80 lg:opacity-100 rounded-lg text-center bg-[#10132E] text-white/90 border border-white/5"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+            <div className="flex flex-col gap-2">
+              {rightLists.map((item, i) => (
+                <span
+                  key={i}
+                  className="py-1.5 px-3 text-[11px] font-mono opacity-80 lg:opacity-100 rounded-lg text-center bg-[#10132E] text-white/90 border border-white/5"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Item 4: Data-Driven Mindset */}
+        <div className="md:col-span-3 lg:col-span-2 relative overflow-hidden rounded-3xl border border-white/[0.1] bg-[#04071D] p-6 lg:p-8 flex flex-col justify-between">
+          <div>
+            <span className="font-mono text-xs text-purple font-medium">ANALYTIC ADVANTAGE</span>
+            <h3 className="font-bold text-lg md:text-xl text-white mt-2">
+              Data-informed thinker passionate about digital experience.
+            </h3>
+            <p className="text-white-100 text-xs mt-2 font-light">
+              Mampu mengekstraksi insight dari data pengguna, memvalidasi asumsi desain dengan kuantitatif data, dan mengukur usability metrik secara empiris.
+            </p>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-xs font-mono text-white/60">
+            <span>A/B Testing Mindset</span>
+            <span className="text-purple">100% Empathetic</span>
+          </div>
+        </div>
+
+        {/* Item 5: The Inside Scoop (Live Ecosystem) */}
+        <div className="md:col-span-3 lg:col-span-3 relative overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-r from-[#0e122b] to-[#04071d] p-6 lg:p-8 flex flex-col justify-between">
+          <div>
+            <span className="font-mono text-xs text-purple font-medium">THE INSIDE SCOOP</span>
+            <h3 className="font-bold text-lg md:text-2xl text-white mt-1">
+              Currently designing ThisMe (BISINDO) &amp; SteamCraft ecosystem.
+            </h3>
+            <p className="text-white-100 text-xs md:text-sm mt-2 font-light">
+              Membangun antarmuka simulasi edukasi sains interaktif (SteamSim Lab) dan kanvas pemodelan 3D generatif di steamcraft.online.
+            </p>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between text-xs">
             <a
               href="https://portofolionaza.steamcraft.online"
               target="_blank"
               rel="noreferrer"
-              className="border border-foreground/20 px-5 py-3 text-xs font-mono uppercase tracking-wider text-foreground/80 hover:border-foreground hover:text-foreground transition-colors flex items-center gap-2"
+              className="inline-flex items-center gap-1.5 text-purple hover:underline font-mono"
             >
-              <Globe size={14} />
-              <span>Live Ecosystem</span>
+              <span>Explore portofolionaza.steamcraft.online</span>
+              <ArrowUpRight size={14} />
             </a>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Hero Interactive UI Mockup Card (Replacing the old stock video!) */}
-        <div className="lg:col-span-5">
-          <motion.div
-            className="relative rounded-lg border border-foreground/15 bg-neutral-950/80 p-5 shadow-2xl backdrop-blur-xl"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.5, ease: EASE }}
-          >
-            {/* Top Bar of the Mockup */}
-            <div className="flex items-center justify-between border-b border-foreground/10 pb-4 mb-4">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-500/80 inline-block" />
-                <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80 inline-block" />
-                <span className="h-2.5 w-2.5 rounded-full bg-green-500/80 inline-block" />
-                <span className="ml-2 font-mono text-[11px] text-foreground/40">
-                  ThisMe_Figma_Prototype.app
-                </span>
-              </div>
-              <span className="border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] font-mono text-primary">
-                Silver Medalist
+        {/* Item 6: Copy Email CTA */}
+        <div className="md:col-span-6 lg:col-span-5 relative overflow-hidden rounded-3xl border border-white/[0.1] bg-[#04071D] p-6 lg:p-8 text-center flex flex-col items-center justify-center">
+          <h3 className="font-bold text-xl md:text-2xl text-white max-w-md">
+            Do you want to start a project or collaboration together?
+          </h3>
+          <div className="mt-5">
+            <button
+              onClick={handleCopy}
+              className="relative inline-flex h-12 overflow-hidden rounded-lg p-[1px] focus:outline-none"
+            >
+              <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+              <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-lg bg-[#161A31] px-7 text-sm font-medium text-white backdrop-blur-3xl gap-2">
+                {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+                {copied ? "Email Address Copied!" : "Copy My Email Address"}
               </span>
-            </div>
-
-            {/* Mockup Tabs */}
-            <div className="flex items-center gap-1 border-b border-foreground/10 pb-2 mb-4 text-xs font-mono">
-              <button
-                onClick={() => setActiveTab("screen")}
-                className={`px-3 py-1 transition-colors ${
-                  activeTab === "screen"
-                    ? "bg-foreground/10 text-foreground border-b-2 border-primary"
-                    : "text-foreground/40 hover:text-foreground/80"
-                }`}
-              >
-                App Flow
-              </button>
-              <button
-                onClick={() => setActiveTab("system")}
-                className={`px-3 py-1 transition-colors ${
-                  activeTab === "system"
-                    ? "bg-foreground/10 text-foreground border-b-2 border-primary"
-                    : "text-foreground/40 hover:text-foreground/80"
-                }`}
-              >
-                Design System
-              </button>
-              <button
-                onClick={() => setActiveTab("research")}
-                className={`px-3 py-1 transition-colors ${
-                  activeTab === "research"
-                    ? "bg-foreground/10 text-foreground border-b-2 border-primary"
-                    : "text-foreground/40 hover:text-foreground/80"
-                }`}
-              >
-                Accessibility
-              </button>
-            </div>
-
-            {/* Mockup Screen View */}
-            <div className="relative aspect-[16/11] w-full overflow-hidden rounded border border-foreground/10 bg-neutral-900/60 p-4">
-              {activeTab === "screen" && (
-                <div className="h-full flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
-                        👋
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-foreground">ThisMe (BISINDO)</div>
-                        <div className="text-[10px] text-foreground/40">Modul Belajar Gestur 01</div>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
-                      Accuracy 96%
-                    </span>
-                  </div>
-
-                  {/* Wireframe Mockup Preview */}
-                  <div className="my-3 grid grid-cols-3 gap-2">
-                    <div className="rounded border border-primary/40 bg-primary/10 p-2.5 text-center">
-                      <div className="text-lg">🤟</div>
-                      <div className="text-[9px] font-mono text-foreground/80 mt-1">"Halo"</div>
-                      <div className="text-[8px] text-primary">Mastered</div>
-                    </div>
-                    <div className="rounded border border-foreground/10 bg-foreground/5 p-2.5 text-center">
-                      <div className="text-lg">✋</div>
-                      <div className="text-[9px] font-mono text-foreground/80 mt-1">"Terima Kasih"</div>
-                      <div className="text-[8px] text-foreground/40">In Progress</div>
-                    </div>
-                    <div className="rounded border border-foreground/10 bg-foreground/5 p-2.5 text-center">
-                      <div className="text-lg">🤞</div>
-                      <div className="text-[9px] font-mono text-foreground/80 mt-1">"Semangat"</div>
-                      <div className="text-[8px] text-foreground/40">Locked</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-[11px] border-t border-foreground/10 pt-2 text-foreground/50">
-                    <span>30+ Screen High-Fidelity UI</span>
-                    <span className="text-primary font-medium">DIMAS TI 2025</span>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "system" && (
-                <div className="h-full flex flex-col justify-between text-xs">
-                  <div>
-                    <div className="font-mono text-[11px] text-foreground/50 mb-2">Color &amp; Typography Tokens</div>
-                    <div className="grid grid-cols-4 gap-2 mb-3">
-                      <div className="h-8 rounded bg-[#EB4034] flex items-end p-1 text-[8px] font-mono text-white">#EB4034</div>
-                      <div className="h-8 rounded bg-[#1A1A1A] border border-white/20 flex items-end p-1 text-[8px] font-mono text-white">#1A1A1A</div>
-                      <div className="h-8 rounded bg-[#22C55E] flex items-end p-1 text-[8px] font-mono text-white">#22C55E</div>
-                      <div className="h-8 rounded bg-[#3B82F6] flex items-end p-1 text-[8px] font-mono text-white">#3B82F6</div>
-                    </div>
-                    <div className="space-y-1.5 font-mono text-[10px] text-foreground/70">
-                      <div className="flex justify-between border-b border-foreground/5 pb-1">
-                        <span>Heading 1</span>
-                        <span className="text-foreground/40">Plus Jakarta Sans 64px / Bold</span>
-                      </div>
-                      <div className="flex justify-between border-b border-foreground/5 pb-1">
-                        <span>Body Regular</span>
-                        <span className="text-foreground/40">Inter 16px / 150% Line-Height</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-[10px] font-mono text-foreground/40">Figma Auto-Layout &amp; Variants V3</div>
-                </div>
-              )}
-
-              {activeTab === "research" && (
-                <div className="h-full flex flex-col justify-between text-xs">
-                  <div>
-                    <div className="font-semibold text-foreground mb-1">Inclusive Sign Language Experience</div>
-                    <p className="text-[11px] text-foreground/60 leading-relaxed mb-3">
-                      Dirancang dengan riset kebutuhan teman Tuli (Deaf community): visual feedback dengan kontras tinggi, micro-haptics, dan konfirmasi gestur tanpa audio dependency.
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
-                      <div className="border border-foreground/10 p-2 bg-foreground/5">
-                        <span className="text-primary font-bold">SUS Score</span>
-                        <div className="text-base text-foreground font-sans font-semibold">92.5 / 100</div>
-                      </div>
-                      <div className="border border-foreground/10 p-2 bg-foreground/5">
-                        <span className="text-primary font-bold">Completion Rate</span>
-                        <div className="text-base text-foreground font-sans font-semibold">96.8%</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-[10px] font-mono text-foreground/40">Usability Study with 20+ Testers</div>
-                </div>
-              )}
-            </div>
-
-            {/* Bottom Card Highlights */}
-            <div className="mt-4 flex items-center justify-between text-xs text-foreground/50 font-mono">
-              <span className="flex items-center gap-1.5">
-                <Palette size={13} className="text-primary" />
-                Figma Component Architecture
-              </span>
-              <a
-                href="#projects"
-                className="hover:text-foreground text-foreground/70 underline underline-offset-2 flex items-center gap-1"
-              >
-                Case Study <ArrowRight size={11} />
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Metrics Row */}
-      <motion.div
-        className="mt-8 grid grid-cols-2 gap-6 border-t border-foreground/10 pt-8 sm:grid-cols-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.9 }}
-      >
-        <div>
-          <p className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground font-mono">
-            <CountUp to={30} suffix="+" />
-          </p>
-          <p className="text-xs text-foreground/40 mt-1 uppercase tracking-wider">Figma Interfaces</p>
-        </div>
-        <div>
-          <p className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground font-mono">
-            <CountUp to={2} suffix=" National" />
-          </p>
-          <p className="text-xs text-foreground/40 mt-1 uppercase tracking-wider">UI/UX Awards</p>
-        </div>
-        <div>
-          <p className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground font-mono">
-            3.80<span className="text-foreground/40 text-sm">/4.00</span>
-          </p>
-          <p className="text-xs text-foreground/40 mt-1 uppercase tracking-wider">UNESA Sains Data</p>
-        </div>
-        <div>
-          <p className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground font-mono">
-            100%
-          </p>
-          <p className="text-xs text-foreground/40 mt-1 uppercase tracking-wider">Human-Centered</p>
-        </div>
-      </motion.div>
-    </section>
-  );
-}
-
-/* ---------- About & Design Philosophy ---------- */
-
-const STATEMENT_A = "Translating user behavior and data insights into seamless,".split(" ");
-const STATEMENT_B = "accessible, and visually compelling product experiences that solve real problems.".split(" ");
-
-function About() {
-  const ref = useRef<HTMLHeadingElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.4"] });
-  const words = [
-    ...STATEMENT_A.map((w) => ({ w, to: 1 })),
-    ...STATEMENT_B.map((w) => ({ w, to: 0.45 })),
-  ];
-  const n = words.length;
-
-  return (
-    <section id="about" className="px-6 py-24 md:px-16 md:py-36 border-b border-foreground/10">
-      <div className="mb-14 flex items-center gap-4">
-        <GrowLine className="h-px w-12 bg-primary" />
-        <FadeUp>
-          <span className="text-xs uppercase tracking-widest text-primary font-mono">
-            About &amp; Philosophy
-          </span>
-        </FadeUp>
-      </div>
-
-      <h2
-        ref={ref}
-        className="max-w-5xl text-[26px] font-medium leading-[1.18] tracking-tighter md:text-[50px]"
-      >
-        {words.map(({ w, to }, i) => (
-          <Word key={i} word={w} to={to} progress={scrollYProgress} range={[i / n, (i + 1) / n]} />
-        ))}
-      </h2>
-
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-foreground/10 pt-10">
-        <div className="md:col-span-5">
-          <FadeUp>
-            <h3 className="text-lg font-semibold text-foreground tracking-tight">
-              Data Scientist with a Passion for UI/UX
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-foreground/60 font-light">
-              Sebagai mahasiswa Sains Data di Universitas Negeri Surabaya (UNESA), saya memadukan
-              dua dunia: ketajaman analisis kuantitatif dan empati desain antarmuka. Saya meyakini
-              bahwa desain terbaik lahir dari perpaduan observasi pengguna yang mendalam dan data
-              penggunaan yang terukur.
-            </p>
-          </FadeUp>
-        </div>
-
-        <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <FadeUp delay={0.1}>
-            <div className="border border-foreground/10 p-5 bg-foreground/[0.02]">
-              <div className="flex items-center gap-2 text-primary font-mono text-xs uppercase tracking-wider mb-2">
-                <Compass size={14} />
-                <span>Design Process</span>
-              </div>
-              <p className="text-xs text-foreground/60 leading-relaxed">
-                Riset Pengguna &rarr; Arsitektur Informasi &rarr; Wireframing &rarr; Design System
-                &rarr; High-Fidelity Prototype &rarr; Usability Testing (SUS).
-              </p>
-            </div>
-          </FadeUp>
-
-          <FadeUp delay={0.2}>
-            <div className="border border-foreground/10 p-5 bg-foreground/[0.02]">
-              <div className="flex items-center gap-2 text-primary font-mono text-xs uppercase tracking-wider mb-2">
-                <BarChart3 size={14} />
-                <span>Data-Driven Advantage</span>
-              </div>
-              <p className="text-xs text-foreground/60 leading-relaxed">
-                Mampu menganalisis metrik UX, funnels konversi, heatmaps, serta melakukan evaluasi
-                A/B testing untuk memastikan keputusan desain berbasis bukti nyata.
-              </p>
-            </div>
-          </FadeUp>
+            </button>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------- Featured UI/UX Projects ---------- */
+/* -------------------------------------------------------------------------- */
+/*                               RECENT PROJECTS                              */
+/* -------------------------------------------------------------------------- */
 
-function Projects() {
+function RecentProjects() {
   const projects = [
     {
-      id: "01",
-      title: "This Me — BISINDO Interactive Learning App",
-      badge: "Award Winner • GEMASTIK & DIMAS TI",
-      category: "Mobile UI/UX • Inclusive Design • EdTech",
-      role: "Lead UI/UX Designer & Researcher",
-      description:
-        "Perancangan aplikasi pembelajaran Bahasa Isyarat Indonesia (BISINDO) interaktif berbasis gamifikasi dan pengenalan gestur. Mengembangkan 30+ antarmuka di Figma, sistem desain komponen komprehensif, dan pengujian kegunaan untuk komunitas Tuli dan pembelajar pemula.",
-      achievements: [
-        "Juara 2 (Medali Perak) Lomba UI/UX DIMAS TI 2025",
-        "Finalis GEMASTIK XVIII 2025 (Divisi Desain Pengalaman Pengguna)",
-        "30+ High-Fidelity Screens & Complete Design System",
-      ],
-      tags: ["Figma", "Design System", "Accessibility", "Mobile App", "Gamification", "Prototyping"],
+      id: 1,
+      title: "This Me — BISINDO Sign Language Learning App",
+      des: "Aplikasi pembelajaran Bahasa Isyarat Indonesia (BISINDO) interaktif dengan 30+ antarmuka di Figma, design system komprehensif, dan pengujian kegunaan ramah komunitas Tuli.",
+      badge: "Juara 2 DIMAS TI • GEMASTIK XVIII Finalist",
+      iconLists: ["Figma", "Design System", "WCAG", "Mobile UX"],
       link: "https://github.com/nazaa-arch/webporto",
-      ctaLabel: "View Case Study",
+      category: "Mobile UI/UX • EdTech",
     },
     {
-      id: "02",
-      title: "SteamCraft Ecosystem & Simulation Studio",
+      id: 2,
+      title: "SteamCraft — Web Simulation Lab & 3D Studio",
+      des: "Perancangan antarmuka modular studio simulasi sains interaktif (SteamSim) dan pemodelan parametrik 3D generatif (MakerCraft 3D) dengan dark workbench UI yang ergonomis.",
       badge: "Live Platform • Lead System Architect",
-      category: "Web Platform • 3D Canvas UX • Science Sim",
-      role: "UI/UX & Lead System Architect",
-      description:
-        "Perancangan antarmuka modular studio simulasi sains (SteamSim Lab) dan pemodelan parametrik 3D generatif (MakerCraft 3D). Mengatasi kompleksitas visualisasi multi-parameter dengan dark-mode workbench yang ergonomis dan interaktif.",
-      achievements: [
-        "Desain antarmuka kanvas 3D WebGL & simulator fisika/kimia",
-        "Arsitektur terintegrasi lintas subdomain (steamcraft.online)",
-        "Respon interaksi instan tanpa beban kognitif berlebih",
-      ],
-      tags: ["Web UI", "3D Modeling UX", "Workbench UI", "Complex Systems", "Design Architecture"],
+      iconLists: ["Web UI", "3D Canvas", "Figma", "Complex Systems"],
       link: "https://portofolionaza.steamcraft.online",
-      ctaLabel: "Visit Live Platform",
+      category: "Web App • 3D Canvas UX",
     },
     {
-      id: "03",
+      id: 3,
       title: "A-KERE — Smart Personal Financial Tracker",
-      badge: "Product & UI/UX",
-      category: "Fintech • Mobile Application",
-      role: "Product & Interaction Designer",
-      description:
-        "Redesain menyeluruh alur pencatatan keuangan harian untuk generasi muda. Mengurangi langkah input transaksi hingga 50% lebih efisien dan menyajikan visualisasi pembagian anggaran yang intuitif.",
-      achievements: [
-        "Alur pencatatan cepat 3-detik (Fast Transaction Flow)",
-        "Visualisasi alokasi budget dan grafik pengeluaran real-time",
-        "Peningkatan efisiensi pencatatan hingga 50%",
-      ],
-      tags: ["Mobile UX", "Fintech Flow", "User Journey", "Information Architecture"],
+      des: "Redesain alur pencatatan keuangan harian untuk generasi muda. Mengurangi langkah input transaksi hingga 50% lebih efisien dengan visualisasi budget yang intuitif.",
+      badge: "Product & UI/UX Design",
+      iconLists: ["Mobile UX", "Fintech Flow", "User Journey", "Figma"],
       link: "#",
-      ctaLabel: "Explore Flow",
+      category: "Fintech • Mobile App",
     },
     {
-      id: "04",
+      id: 4,
       title: "Naza Cell POS & Retail Management Dashboard",
-      badge: "Enterprise & Operations",
-      category: "Desktop Dashboard • Retail POS System",
-      role: "Product & System Designer",
-      description:
-        "Sistem dashboard kasir ritel dan manajemen inventaris untuk mengelola 100+ SKU dan transaksi layanan keuangan digital harian (PPOB, pulsa, e-money) dengan kecepatan operasional tinggi.",
-      achievements: [
-        "Dirancang untuk menangani 50-80 transaksi cepat per hari",
-        "Arsitektur inventaris multi-supplier dengan stock tracking 100%",
-        "Tata letak keyboard-friendly untuk kasir toko",
-      ],
-      tags: ["Dashboard Design", "POS Interface", "B2B UX", "Inventory Systems"],
+      des: "Dashboard kasir dan manajemen inventaris untuk 100+ SKU dan puluhan transaksi layanan keuangan digital harian (PPOB, pulsa, e-money) dengan kecepatan operasional tinggi.",
+      badge: "Dashboard & Operations",
+      iconLists: ["Dashboard UI", "POS System", "Information Architecture"],
       link: "#",
-      ctaLabel: "View Dashboard System",
+      category: "Desktop Dashboard • B2B UX",
     },
   ];
 
   return (
-    <section id="projects" className="px-6 py-24 md:px-16 md:py-36 border-b border-foreground/10">
-      <div className="mb-20 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <div>
-          <div className="flex items-center gap-4 mb-4">
-            <GrowLine className="h-px w-12 bg-primary" />
-            <FadeUp>
-              <span className="text-xs uppercase tracking-widest text-primary font-mono">
-                Featured Work
-              </span>
-            </FadeUp>
-          </div>
-          <h2 className="text-[32px] sm:text-[44px] md:text-[54px] font-semibold tracking-tighter text-foreground">
-            Selected UI/UX Projects.
-          </h2>
-        </div>
-        <p className="max-w-md text-xs font-mono text-foreground/50 leading-relaxed">
-          Koleksi proyek perancangan antarmuka, studi kasus desain produk, dan sistem digital yang
-          memadukan estetika dengan fungsionalitas.
-        </p>
-      </div>
+    <section id="projects" className="py-20">
+      <h2 className="text-3xl md:text-5xl font-bold text-center text-white">
+        A small selection of <span className="text-purple">recent projects</span>
+      </h2>
 
-      <div className="space-y-12">
-        {projects.map((p) => (
-          <FadeUp key={p.id}>
-            <div className="group relative border border-foreground/15 bg-neutral-950/40 p-6 md:p-10 transition-all duration-300 hover:border-primary/50 hover:bg-neutral-950/70">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Left meta & overview */}
-                <div className="lg:col-span-7 flex flex-col justify-between h-full">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3 mb-4">
-                      <span className="font-mono text-xs text-primary font-bold">{p.id}</span>
-                      <span className="border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-mono text-primary">
-                        {p.badge}
-                      </span>
-                      <span className="text-xs font-mono text-foreground/40">{p.category}</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-14">
+        {projects.map((item) => (
+          <div
+            key={item.id}
+            className="group relative rounded-3xl border border-white/[0.1] bg-[#13162D] p-6 lg:p-8 hover:border-purple/50 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div>
+              {/* Thumbnail Mockup Container */}
+              <div className="relative flex items-center justify-center w-full overflow-hidden h-[200px] sm:h-[260px] mb-6 rounded-2xl bg-[#0e122b] border border-white/5 p-4">
+                <div className="w-full h-full rounded-xl border border-white/10 bg-black-100/80 p-4 flex flex-col justify-between relative overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] text-purple bg-purple/10 px-2.5 py-0.5 rounded border border-purple/30">
+                      {item.badge}
+                    </span>
+                    <span className="text-[10px] font-mono text-white/40">{item.category}</span>
+                  </div>
+
+                  <div className="my-auto py-2">
+                    <div className="text-lg font-bold text-white group-hover:text-purple transition-colors">
+                      {item.title}
                     </div>
-
-                    <h3 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                      {p.title}
-                    </h3>
-
-                    <div className="mt-2 text-xs font-mono text-foreground/50">
-                      Peran: <span className="text-foreground/80">{p.role}</span>
-                    </div>
-
-                    <p className="mt-4 text-sm text-foreground/70 leading-relaxed font-light">
-                      {p.description}
-                    </p>
-
-                    <div className="mt-6 space-y-2 border-l-2 border-primary/30 pl-4 py-1">
-                      {p.achievements.map((ach, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs text-foreground/80">
-                          <CheckCircle2 size={13} className="text-primary mt-0.5 shrink-0" />
-                          <span>{ach}</span>
-                        </div>
-                      ))}
+                    <div className="text-xs text-white-100 font-light mt-1 line-clamp-2">
+                      {item.des}
                     </div>
                   </div>
 
-                  <div className="mt-8 flex flex-wrap items-center gap-2">
-                    {p.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1 text-[11px] font-mono text-foreground/60"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right Interactive Card / Preview */}
-                <div className="lg:col-span-5 flex flex-col justify-between h-full border-t border-foreground/10 pt-6 lg:border-t-0 lg:pt-0 lg:border-l lg:border-foreground/10 lg:pl-8">
-                  <div className="rounded border border-foreground/10 bg-neutral-900/40 p-5">
-                    <div className="flex items-center justify-between text-xs font-mono text-foreground/40 mb-3">
-                      <span>PROJECT PREVIEW</span>
-                      <Layers size={14} className="text-primary" />
-                    </div>
-
-                    <div className="space-y-3 text-xs">
-                      <div className="border border-foreground/10 p-3 bg-black/40">
-                        <div className="text-[10px] font-mono text-primary uppercase">Core Focus</div>
-                        <div className="text-foreground/90 font-medium mt-0.5">
-                          {p.id === "01" && "Gesture Usability & Inclusivity"}
-                          {p.id === "02" && "Complex Parameter Workspace UI"}
-                          {p.id === "03" && "3-Step Fast Financial Logging"}
-                          {p.id === "04" && "Keyboard-Driven Checkout Flow"}
-                        </div>
-                      </div>
-
-                      <div className="border border-foreground/10 p-3 bg-black/40">
-                        <div className="text-[10px] font-mono text-primary uppercase">Tooling</div>
-                        <div className="text-foreground/80 font-mono text-[11px] mt-0.5">
-                          {p.id === "01" && "Figma • FigJam • Maze Testing • Color Contrast WCAG"}
-                          {p.id === "02" && "Figma UI • WebGL Canvas • Modern Dark Theme"}
-                          {p.id === "03" && "Figma Interactive Components • Micro-interactions"}
-                          {p.id === "04" && "Figma Dashboard Design • Information Hierarchy"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex items-center gap-4">
-                    <a
-                      href={p.link}
-                      target={p.link.startsWith("http") ? "_blank" : undefined}
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 clip-corner bg-primary px-5 py-2.5 text-xs font-medium uppercase tracking-wider text-primary-foreground hover:opacity-90 transition-opacity"
-                    >
-                      <span>{p.ctaLabel}</span>
-                      <ExternalLink size={13} />
-                    </a>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-white/50 border-t border-white/10 pt-2">
+                    <span>Muhammad Naza Firmansyah</span>
+                    <span className="text-emerald-400">High-Fidelity</span>
                   </div>
                 </div>
               </div>
+
+              <h3 className="font-bold lg:text-2xl md:text-xl text-base text-white group-hover:text-purple transition-colors line-clamp-1">
+                {item.title}
+              </h3>
+
+              <p className="lg:text-sm lg:font-normal font-light text-xs line-clamp-2 text-[#BEC1DD] my-3">
+                {item.des}
+              </p>
             </div>
-          </FadeUp>
+
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {item.iconLists.map((icon, index) => (
+                  <span
+                    key={index}
+                    className="border border-white/[0.1] bg-black-100 rounded-full px-2.5 py-0.5 text-[10px] font-mono text-white/70"
+                  >
+                    {icon}
+                  </span>
+                ))}
+              </div>
+
+              <a
+                href={item.link}
+                target={item.link.startsWith("http") ? "_blank" : undefined}
+                rel="noreferrer"
+                className="flex items-center text-xs lg:text-sm text-purple hover:underline gap-1 font-medium shrink-0 ml-2"
+              >
+                <span>Check Details</span>
+                <ArrowUpRight size={15} />
+              </a>
+            </div>
+          </div>
         ))}
       </div>
     </section>
   );
 }
 
-/* ---------- Awards & Recognitions ---------- */
+/* -------------------------------------------------------------------------- */
+/*                          EXPERIENCE & ACHIEVEMENTS                         */
+/* -------------------------------------------------------------------------- */
 
-function Awards() {
-  const awards = [
+function Experience() {
+  const experiences = [
     {
-      year: "2025",
+      id: 1,
       title: "Juara 2 Lomba UI/UX DIMAS TI (Medali Perak)",
-      issuer: "DIMAS TI National Competition",
-      desc: "Meraih Medali Perak dalam perancangan antarmuka 'This Me', aplikasi pembelajaran Bahasa Isyarat Indonesia (BISINDO) interaktif berbasis Figma.",
-      highlight: true,
+      desc: "Meraih Medali Perak tingkat nasional dalam perancangan aplikasi 'This Me', aplikasi pembelajaran Bahasa Isyarat Indonesia (BISINDO) dengan 30+ antarmuka di Figma.",
+      issuer: "DIMAS TI National Competition 2025",
+      icon: <Trophy className="text-yellow-400" size={28} />,
     },
     {
-      year: "2025",
+      id: 2,
       title: "Finalis GEMASTIK XVIII (Divisi UX Design)",
-      issuer: "Puspresnas / Balai Pengembangan Talenta Indonesia",
-      desc: "Terpilih mewakili Universitas Negeri Surabaya (UNESA) dalam kompetisi bergengsi GEMASTIK XVIII melalui karya desain pengalaman pengguna 'This Me'.",
-      highlight: true,
+      desc: "Terpilih mewakili Universitas Negeri Surabaya (UNESA) dalam kompetisi prestisius GEMASTIK XVIII oleh Puspresnas Kemendikbudristek melalui karya 'This Me'.",
+      issuer: "Puspresnas / BPTI 2025",
+      icon: <Award className="text-purple" size={28} />,
     },
     {
-      year: "2026",
-      title: "Finalis Gayatama International Competition",
-      issuer: "Gayatama International",
-      desc: "Bidang Food Science Communication & Product Branding.",
-      highlight: false,
+      id: 3,
+      title: "UI/UX & Lead System Architect - SteamCraft",
+      desc: "Memimpin perancangan antarmuka dan arsitektur sistem pada platform SteamCraft, studio simulasi virtual SteamSim Lab, dan kanvas 3D MakerCraft.",
+      issuer: "steamcraft.online & portofolionaza.steamcraft.online",
+      icon: <Monitor className="text-blue-400" size={28} />,
     },
     {
-      year: "2022 - 2024",
-      title: "Perwakilan Sekolah OSN Bidang Informatika",
-      issuer: "PUSPRESNAS - Kementerian Pendidikan & Kebudayaan",
-      desc: "Terpilih mewakili sekolah dalam Olimpiade Sains Nasional bidang Informatika selama dua periode berturut-turut.",
-      highlight: false,
+      id: 4,
+      title: "Business & Operations Manager - Toko Naza Cell",
+      desc: "Mengelola operasional ritel, integrasi 100+ SKU inventaris toko, dan puluhan transaksi layanan keuangan digital (PPOB, transfer, e-money) secara terstruktur.",
+      issuer: "Naza Cell (2019 - Sekarang)",
+      icon: <Briefcase className="text-emerald-400" size={28} />,
     },
   ];
 
   return (
-    <section id="awards" className="px-6 py-24 md:px-16 md:py-36 border-b border-foreground/10">
-      <div className="mb-16 flex items-center gap-4">
-        <GrowLine className="h-px w-12 bg-primary" />
-        <FadeUp>
-          <span className="text-xs uppercase tracking-widest text-primary font-mono">
-            Recognition &amp; Honors
-          </span>
-        </FadeUp>
-      </div>
+    <section id="experience" className="py-20">
+      <h2 className="text-3xl md:text-5xl font-bold text-center text-white">
+        My work experience &amp; <span className="text-purple">achievements</span>
+      </h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <div className="lg:col-span-5">
-          <h2 className="text-[32px] sm:text-[44px] font-semibold tracking-tighter text-foreground">
-            Proven Track Record in UI/UX Competitions.
-          </h2>
-          <p className="mt-4 text-sm text-foreground/60 leading-relaxed font-light">
-            Pengakuan kompetitif di tingkat nasional yang memvalidasi kedalaman metodologi riset,
-            kualitas visual, dan kemampuan eksekusi prototype.
-          </p>
-
-          <div className="mt-8 border border-primary/30 bg-primary/10 p-5 rounded">
-            <div className="flex items-center gap-3">
-              <Award size={28} className="text-primary" />
-              <div>
-                <div className="text-sm font-semibold text-foreground">
-                  Silver Medalist &amp; Finalist
-                </div>
-                <div className="text-xs text-foreground/60 font-mono">
-                  DIMAS TI 2025 &amp; GEMASTIK XVIII
-                </div>
-              </div>
+      <div className="w-full mt-12 grid lg:grid-cols-4 grid-cols-1 gap-6">
+        {experiences.map((card) => (
+          <div
+            key={card.id}
+            className="lg:col-span-2 rounded-2xl border border-white/[0.1] bg-gradient-to-b from-[#0c0e23] to-[#04071d] p-6 lg:p-8 flex items-start gap-4 hover:border-purple/50 transition-all duration-300"
+          >
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10 shrink-0">
+              {card.icon}
+            </div>
+            <div>
+              <h3 className="text-lg md:text-xl font-bold text-white">{card.title}</h3>
+              <span className="text-xs font-mono text-purple block mt-0.5">{card.issuer}</span>
+              <p className="text-white-100 text-xs md:text-sm mt-3 font-light leading-relaxed">
+                {card.desc}
+              </p>
             </div>
           </div>
-        </div>
-
-        <div className="lg:col-span-7 divide-y divide-foreground/10 border-y border-foreground/10">
-          {awards.map((a, i) => (
-            <FadeUp key={i} delay={i * 0.1}>
-              <div className="py-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4 group">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs text-primary">{a.year}</span>
-                    {a.highlight && (
-                      <span className="bg-primary/20 text-primary text-[10px] font-mono px-2 py-0.5 rounded">
-                        National Award
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
-                    {a.title}
-                  </h3>
-                  <p className="text-xs font-mono text-foreground/40">{a.issuer}</p>
-                  <p className="text-xs text-foreground/60 leading-relaxed pt-1 max-w-xl">
-                    {a.desc}
-                  </p>
-                </div>
-              </div>
-            </FadeUp>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- Skills & Toolkit ---------- */
-
-function Toolkit() {
-  const skillCategories = [
-    {
-      title: "UI/UX & Product Design",
-      skills: [
-        "User Interface (UI) Design",
-        "User Experience (UX) Research",
-        "Interactive Prototyping",
-        "Design Systems & Token Architecture",
-        "Wireframing & User Flows",
-        "Usability Testing (SUS Method)",
-        "Information Architecture",
-        "Accessibility (WCAG 2.1)",
-      ],
-    },
-    {
-      title: "Design & Dev Tools",
-      skills: [
-        "Figma (Auto-layout, Components, Variables)",
-        "FigJam (Brainstorming & User Journeys)",
-        "Adobe Illustrator",
-        "HTML5 / Modern CSS / Tailwind",
-        "React & Framer Motion",
-        "Git & GitHub Workflow",
-        "Prototyping Tools",
-      ],
-    },
-    {
-      title: "Data Science & Analytical Edge",
-      skills: [
-        "Python (Pandas, Scikit-Learn)",
-        "Data-Informed UX Decision Making",
-        "SQL & Relational Database Design",
-        "A/B Testing Mindset",
-        "User Behavior Analytics",
-        "Statistical Problem Solving",
-      ],
-    },
-  ];
-
-  return (
-    <section id="toolkit" className="px-6 py-24 md:px-16 md:py-36 border-b border-foreground/10">
-      <div className="mb-16 flex items-center gap-4">
-        <GrowLine className="h-px w-12 bg-primary" />
-        <FadeUp>
-          <span className="text-xs uppercase tracking-widest text-primary font-mono">
-            Toolkit &amp; Capabilities
-          </span>
-        </FadeUp>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {skillCategories.map((cat, idx) => (
-          <FadeUp key={cat.title} delay={idx * 0.15}>
-            <div className="border border-foreground/15 bg-neutral-950/40 p-6 h-full flex flex-col justify-between">
-              <div>
-                <span className="text-xs font-mono text-primary">0{idx + 1}</span>
-                <h3 className="text-lg font-semibold text-foreground tracking-tight mt-1 mb-5">
-                  {cat.title}
-                </h3>
-                <ul className="space-y-2.5">
-                  {cat.skills.map((s) => (
-                    <li key={s} className="flex items-center gap-2.5 text-xs text-foreground/70">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      <span>{s}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </FadeUp>
         ))}
       </div>
     </section>
   );
 }
 
-/* ---------- Contact Section & Footer ---------- */
+/* -------------------------------------------------------------------------- */
+/*                                 MY APPROACH                                */
+/* -------------------------------------------------------------------------- */
 
-function Contact() {
+function Approach() {
+  const phases = [
+    {
+      phase: "Phase 1",
+      title: "Planning & User Research",
+      desc: "Memulai dengan riset mendalam terhadap target pengguna, pemetaan empati (empathy mapping), arsitektur informasi, dan perumusan alur pengguna (user flow) sebelum menyentuh kanvas desain.",
+      tag: "Research & Strategy",
+    },
+    {
+      phase: "Phase 2",
+      title: "Design System & Prototyping",
+      desc: "Membangun sistem desain modular, auto-layout variants, wireframing, hingga high-fidelity interactive prototype di Figma yang memenuhi standar aksesibilitas WCAG.",
+      tag: "Craft & Interaction",
+    },
+    {
+      phase: "Phase 3",
+      title: "Testing, Metrics & Validation",
+      desc: "Melakukan pengujian kegunaan langsung (Usability Testing), evaluasi skor SUS (System Usability Scale), dan iterasi berkelanjutan berbasis data perilaku pengguna nyata.",
+      tag: "Data & Validation",
+    },
+  ];
+
   return (
-    <section id="contact" className="px-6 py-24 md:px-16 md:py-36 relative overflow-hidden">
-      <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+    <section id="approach" className="py-20">
+      <h2 className="text-3xl md:text-5xl font-bold text-center text-white">
+        My <span className="text-purple">approach</span>
+      </h2>
 
-      <div className="mb-16 flex items-center gap-4">
-        <GrowLine className="h-px w-12 bg-primary" />
-        <FadeUp>
-          <span className="text-xs uppercase tracking-widest text-primary font-mono">
-            Get In Touch
-          </span>
-        </FadeUp>
+      <div className="my-14 flex flex-col lg:flex-row items-center justify-center gap-6">
+        {phases.map((item, index) => (
+          <div
+            key={index}
+            className="w-full lg:w-1/3 rounded-3xl border border-white/[0.1] bg-[#0c0e23] p-8 relative overflow-hidden flex flex-col justify-between min-h-[320px] hover:border-purple/50 transition-all duration-300 group"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <span className="inline-block rounded-full border border-purple/40 bg-purple/10 px-3 py-1 font-mono text-xs text-purple font-semibold">
+                  {item.phase}
+                </span>
+                <span className="font-mono text-[11px] text-white/40">{item.tag}</span>
+              </div>
+
+              <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-purple transition-colors">
+                {item.title}
+              </h3>
+
+              <p className="text-white-100 text-xs md:text-sm mt-4 font-light leading-relaxed">
+                {item.desc}
+              </p>
+            </div>
+
+            <div className="mt-6 border-t border-white/10 pt-4 flex items-center gap-2 text-xs font-mono text-white/40">
+              <Lightbulb size={14} className="text-purple" />
+              <span>User-Centered Iteration</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   FOOTER                                   */
+/* -------------------------------------------------------------------------- */
+
+function Footer() {
+  return (
+    <footer id="contact" className="w-full pt-20 pb-10 relative overflow-hidden">
+      {/* Background Grid */}
+      <div className="w-full absolute left-0 -bottom-72 min-h-96 pointer-events-none opacity-20">
+        <div className="h-full w-full bg-grid-white" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-        <div className="lg:col-span-8">
-          <h2 className="text-[36px] sm:text-[54px] md:text-[68px] font-semibold leading-[0.98] tracking-tighter text-foreground">
-            LET'S CREATE SOMETHING
-            <br />
-            <span className="text-primary">EXCEPTIONAL.</span>
-          </h2>
-          <p className="mt-6 max-w-xl text-base text-foreground/60 leading-relaxed font-light">
-            Terbuka untuk kolaborasi proyek UI/UX design, perancangan aplikasi web &amp; mobile,
-            serta peluang magang / pekerjaan profesional.
-          </p>
+      <div className="flex flex-col items-center text-center">
+        <h2 className="text-3xl md:text-5xl font-bold text-white max-w-2xl">
+          Ready to take <span className="text-purple">your digital experience</span> to the next level?
+        </h2>
+        <p className="text-white-100 text-sm md:text-base mt-4 max-w-lg font-light">
+          Reach out to me today and let's discuss how I can help you craft intuitive, user-centered digital products.
+        </p>
 
-          <div className="mt-10 flex flex-wrap gap-4">
-            <a
-              href="mailto:firmannaza307@gmail.com"
-              className="clip-corner bg-primary px-7 py-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:opacity-90 transition-opacity flex items-center gap-2"
-            >
-              <Mail size={15} />
-              <span>firmannaza307@gmail.com</span>
-            </a>
-
-            <a
-              href="https://wa.me/"
-              target="_blank"
-              rel="noreferrer"
-              className="border border-foreground/20 px-6 py-3 text-xs font-mono uppercase tracking-wider text-foreground hover:border-foreground transition-colors flex items-center gap-2"
-            >
-              <Phone size={15} />
-              <span>WhatsApp Chat</span>
-            </a>
-          </div>
-        </div>
-
-        <div className="lg:col-span-4 border border-foreground/15 bg-neutral-950/60 p-6 space-y-4">
-          <div className="text-xs font-mono text-foreground/40 uppercase">Direct Channels</div>
-
-          <div className="space-y-3 text-xs">
-            <a
-              href="https://linkedin.com/in/nazafirman"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between py-2 border-b border-foreground/10 text-foreground/80 hover:text-primary transition-colors"
-            >
-              <span className="flex items-center gap-2 font-mono">
-                <Linkedin size={14} /> linkedin.com/in/nazafirman
-              </span>
-              <ArrowUpRight size={14} />
-            </a>
-
-            <a
-              href="https://github.com/nazaa-arch"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between py-2 border-b border-foreground/10 text-foreground/80 hover:text-primary transition-colors"
-            >
-              <span className="flex items-center gap-2 font-mono">
-                <Github size={14} /> github.com/nazaa-arch
-              </span>
-              <ArrowUpRight size={14} />
-            </a>
-
-            <a
-              href="https://portofolionaza.steamcraft.online"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between py-2 border-b border-foreground/10 text-foreground/80 hover:text-primary transition-colors"
-            >
-              <span className="flex items-center gap-2 font-mono">
-                <Globe size={14} /> portofolionaza.steamcraft.online
-              </span>
-              <ArrowUpRight size={14} />
-            </a>
-          </div>
-
-          <div className="pt-2 text-[11px] font-mono text-foreground/40">
-            Tawangsari, Taman, Sidoarjo • Jawa Timur, Indonesia
-          </div>
+        <div className="mt-8">
+          <MagicButton
+            title="Let's get in touch"
+            icon={<ArrowRight size={16} />}
+            position="right"
+            asLink
+            href="mailto:firmannaza307@gmail.com"
+          />
         </div>
       </div>
 
-      <footer className="mt-24 border-t border-foreground/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-foreground/40">
-        <div>
-          &copy; {new Date().getFullYear()} Muhammad Naza Firmansyah. All rights reserved.
-        </div>
-        <div className="flex items-center gap-6">
-          <a href="#about" className="hover:text-foreground transition-colors">
-            Back to Top
+      <div className="flex mt-16 md:flex-row flex-col justify-between items-center gap-4 border-t border-white/10 pt-8">
+        <p className="md:text-sm text-xs md:font-normal font-light text-white/60 font-mono">
+          Copyright &copy; {new Date().getFullYear()} Muhammad Naza Firmansyah
+        </p>
+
+        <div className="flex items-center md:gap-3 gap-6">
+          <a
+            href="https://github.com/nazaa-arch"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub"
+            className="w-10 h-10 cursor-pointer flex justify-center items-center backdrop-filter backdrop-blur-lg bg-opacity-75 bg-black-200 rounded-lg border border-white/10 hover:border-purple text-white hover:text-purple transition-colors"
+          >
+            <Github size={18} />
+          </a>
+
+          <a
+            href="https://linkedin.com/in/nazafirman"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn"
+            className="w-10 h-10 cursor-pointer flex justify-center items-center backdrop-filter backdrop-blur-lg bg-opacity-75 bg-black-200 rounded-lg border border-white/10 hover:border-purple text-white hover:text-purple transition-colors"
+          >
+            <Linkedin size={18} />
+          </a>
+
+          <a
+            href="https://wa.me/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="WhatsApp"
+            className="w-10 h-10 cursor-pointer flex justify-center items-center backdrop-filter backdrop-blur-lg bg-opacity-75 bg-black-200 rounded-lg border border-white/10 hover:border-purple text-white hover:text-purple transition-colors"
+          >
+            <Phone size={18} />
+          </a>
+
+          <a
+            href="https://portofolionaza.steamcraft.online"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="SteamCraft Portfolio"
+            className="w-10 h-10 cursor-pointer flex justify-center items-center backdrop-filter backdrop-blur-lg bg-opacity-75 bg-black-200 rounded-lg border border-white/10 hover:border-purple text-white hover:text-purple transition-colors"
+          >
+            <Globe size={18} />
           </a>
         </div>
-      </footer>
-    </section>
+      </div>
+    </footer>
   );
 }
 
-/* ---------- Main Component ---------- */
+/* -------------------------------------------------------------------------- */
+/*                               MAIN COMPONENT                               */
+/* -------------------------------------------------------------------------- */
 
 export default function App() {
   return (
-    <MotionConfig reducedMotion="user">
-      <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
-        <Header />
-        <main>
-          <Hero />
-          <About />
-          <Projects />
-          <Awards />
-          <Toolkit />
-          <Contact />
-        </main>
+    <main className="relative bg-black-100 flex justify-center items-center flex-col overflow-hidden mx-auto sm:px-10 px-5 text-white">
+      <div className="max-w-7xl w-full">
+        <FloatingNav />
+        <Hero />
+        <BentoGrid />
+        <RecentProjects />
+        <Experience />
+        <Approach />
+        <Footer />
       </div>
-    </MotionConfig>
+    </main>
   );
 }
