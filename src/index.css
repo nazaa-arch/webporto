@@ -28,6 +28,7 @@
 
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.04);
   --shadow-md: 0 8px 24px -8px rgba(16, 102, 255, 0.18);
+  --shadow-3d: 0 24px 50px -15px rgba(16, 102, 255, 0.22);
 
   --font: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
   --nav-h: 76px;
@@ -96,6 +97,7 @@ img {
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   backdrop-filter: blur(16px) saturate(140%);
   box-shadow: var(--shadow-md);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .nav-logo {
@@ -305,10 +307,9 @@ img {
 
 a.tile:hover {
   box-shadow: var(--shadow-md);
-  scale: 1.03;
+  scale: 1.04;
 }
 
-/* intro: elemen disembunyikan sampai animasi tumpuk → sebar dijalankan */
 .intro .tile,
 .intro .hero-title span,
 .intro .hero-lines,
@@ -445,6 +446,29 @@ a.tile:hover {
   transform: none;
 }
 
+/* ---------- 3D Card Interactive Styles (zyxkoo.dev cursor tracking) ---------- */
+.card-3d-wrapper {
+  perspective: 1200px;
+  width: 100%;
+}
+
+.card-3d-panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--r-xl);
+  padding: 36px 44px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.card-3d-panel:hover {
+  border-color: rgba(16, 102, 255, 0.32);
+  box-shadow: var(--shadow-3d);
+}
+
 /* ---------- Work ---------- */
 .display-head {
   margin-bottom: 72px;
@@ -563,15 +587,16 @@ a.tile:hover {
   color: var(--neutral-500);
 }
 
+.works-list {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
 .work-row {
   display: grid;
   grid-template-columns: minmax(0, 3.4fr) minmax(0, 8.6fr);
   gap: 24px 48px;
-  padding: 48px 0;
-}
-
-.work-row + .work-row {
-  border-top: 1px solid var(--neutral-200);
 }
 
 .work-info {
@@ -584,7 +609,7 @@ a.tile:hover {
   margin: 0;
   font-size: 32px;
   line-height: 40px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.015em;
   color: var(--ink);
 }
@@ -593,14 +618,15 @@ a.tile:hover {
   margin: 8px 0 0;
   font-size: 14px;
   line-height: 20px;
-  color: var(--neutral-500);
+  color: var(--primary);
+  font-weight: 500;
 }
 
 .work-desc {
   margin: 16px 0 32px;
   max-width: 380px;
-  font-size: 20px;
-  line-height: 30px;
+  font-size: 17px;
+  line-height: 27px;
   font-weight: 300;
   color: var(--neutral-700);
 }
@@ -612,7 +638,7 @@ a.tile:hover {
 .work-shots {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 16px;
 }
 
 .shot {
@@ -628,11 +654,12 @@ a.tile:hover {
   padding: 16px;
   border: 1px solid var(--neutral-200);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
+  will-change: transform;
 }
 
 .shot:hover {
   box-shadow: var(--shadow-md);
-  transform: scale(1.03);
+  transform: translateY(-4px) scale(1.02);
 }
 
 /* ---------- Curved Arc Gallery ---------- */
@@ -1280,6 +1307,7 @@ a.tile:hover {
 }
 
 @media (max-width: 1023px) {
+  .card-3d-panel { padding: 28px 24px; }
   .cta-panel { padding: 56px 40px 0; }
   .cta-info { grid-template-columns: 1fr 1fr; }
   .cta-info > div:nth-child(3) {
@@ -1303,6 +1331,7 @@ a.tile:hover {
 
 @media (max-width: 759px) {
   :root { --nav-h: 64px; }
+  .card-3d-panel { padding: 20px 16px; }
   .hero {
     --tw: 46vw;
     flex-direction: column;
@@ -1325,7 +1354,6 @@ a.tile:hover {
   .flag { width: 34px; height: 34px; margin-left: -9px; }
   .flag::after { display: none; }
   .clients { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .work-row { padding: 40px 0; }
   .services { padding-top: 88px; }
   .service-row {
     grid-template-columns: auto minmax(0, 1fr) 40px;
@@ -1381,4 +1409,5 @@ a.tile:hover {
   .status-dot::after { animation: none; }
   .nav, .nav-mobile-panel { transition: none; }
   .stack .meet { transform: none; border-radius: 0; }
+  .card-3d-panel { transform: none !important; }
 }
