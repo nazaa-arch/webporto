@@ -1,92 +1,433 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Award,
-  Check,
-  Copy,
-  Sparkles,
-  Menu,
-  X,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Copy, Menu, X } from "lucide-react";
 
 export default function App() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
   const heroRef = useRef<HTMLElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   const arcTrackRef = useRef<HTMLDivElement>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const startProjectRef = useRef<HTMLAnchorElement>(null);
 
-  // Navbar scrolled state
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 24);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Parallax pointer tracking for hero tiles
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-
-    const handlePointerMove = (e: PointerEvent) => {
-      const r = hero.getBoundingClientRect();
-      const mx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      const my = ((e.clientY - r.top) / r.height) * 2 - 1;
-      hero.style.setProperty("--mx", mx.toFixed(3));
-      hero.style.setProperty("--my", my.toFixed(3));
-    };
-
-    const handlePointerLeave = () => {
-      hero.style.setProperty("--mx", "0");
-      hero.style.setProperty("--my", "0");
-    };
-
-    hero.addEventListener("pointermove", handlePointerMove);
-    hero.addEventListener("pointerleave", handlePointerLeave);
-    return () => {
-      hero.removeEventListener("pointermove", handlePointerMove);
-      hero.removeEventListener("pointerleave", handlePointerLeave);
-    };
-  }, []);
-
-  // Arc carousel animation
-  useEffect(() => {
-    const track = arcTrackRef.current;
-    if (!track) return;
-
-    let animId: number;
-    let offset = 0;
-    const speed = 0.5;
-
-    const animate = () => {
-      offset -= speed;
-      const cards = track.children;
-      const totalWidth = 320 * cards.length;
-      if (Math.abs(offset) > totalWidth / 2) {
-        offset = 0;
+    // -------------------------------------------------------------
+    // 1. Nav scrolled toggle
+    // -------------------------------------------------------------
+    const nav = navRef.current;
+    const onScrollNav = () => {
+      if (nav) {
+        nav.classList.toggle("scrolled", window.scrollY > 24);
       }
-      track.style.transform = `translateX(${offset}px)`;
-      animId = requestAnimationFrame(animate);
+    };
+    window.addEventListener("scroll", onScrollNav, { passive: true });
+    onScrollNav();
+
+    // -------------------------------------------------------------
+    // 2. Start a project Gmail compose on desktop
+    // -------------------------------------------------------------
+    const startBtn = startProjectRef.current;
+    if (startBtn && window.matchMedia("(pointer:fine)").matches) {
+      startBtn.href =
+        "https://mail.google.com/mail/?view=cm&fs=1&to=firmannaza307@gmail.com&su=New%20project%20inquiry";
+      startBtn.target = "_blank";
+      startBtn.rel = "noopener noreferrer";
+    }
+
+    // -------------------------------------------------------------
+    // 3. Intro animation & Hero Fly-away scroll animation
+    // -------------------------------------------------------------
+    const hero = heroRef.current;
+    const root = document.documentElement;
+    let introDone = !root.classList.contains("intro");
+    const rot = [-9, 6, -4, 8, -6, 3];
+
+    let flyTiles: HTMLElement[] = [];
+    let eyebrows: HTMLElement[] = [];
+    let fly: { dx: number; dy: number; dist: number; rot: number }[] = [];
+    let flyTick = false;
+    const flyOn = !window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+    const measureFly = () => {
+      if (!flyOn || !hero) return;
+      const hr = hero.getBoundingClientRect();
+      const title = hero.querySelector(".hero-title");
+      if (!title) return;
+      const t = title.getBoundingClientRect();
+      const cx = t.left + t.width / 2 - hr.left;
+      const cy = t.top + t.height / 2 - hr.top;
+      const vw = hero.clientWidth;
+      const vh = hero.clientHeight;
+      const m = 80;
+
+      fly = flyTiles.map((el, i) => {
+        const prev = el.style.transform;
+        el.style.transform = "none";
+        const r = el.getBoundingClientRect();
+        el.style.transform = prev;
+        const x = r.left - hr.left;
+        const y = r.top - hr.top;
+        let dx = x + r.width / 2 - cx;
+        let dy = y + r.height / 2 - cy;
+        if (dy > 0) dy = 0;
+        if (Math.abs(dx) < 20 && dy === 0) dx = i % 2 ? 1 : -1;
+        const len = Math.hypot(dx, dy) || 1;
+        dx /= len;
+        dy /= len;
+
+        const out: number[] = [];
+        if (dx < -0.01) out.push((x + r.width + m) / -dx);
+        if (dx > 0.01) out.push((vw - x + m) / dx);
+        if (dy < -0.01) out.push((y + r.height + m) / -dy);
+        return { dx, dy, dist: Math.min(...out, vh * 1.5), rot: rot[i] || 0 };
+      });
     };
 
-    animId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animId);
+    const updateFly = () => {
+      flyTick = false;
+      if (!flyOn || !introDone || !fly.length || !hero) return;
+      const range = hero.offsetHeight * 0.7;
+      const p = Math.min(Math.max(-hero.getBoundingClientRect().top / range, 0), 1);
+      const e = p * (0.35 + 0.65 * p);
+
+      flyTiles.forEach((el, i) => {
+        const f = fly[i];
+        if (!f) return;
+        el.style.transform =
+          p === 0
+            ? ""
+            : `translate(${(f.dx * f.dist * e).toFixed(1)}px, ${(f.dy * f.dist * e).toFixed(1)}px) rotate(${(f.rot * 2 * e).toFixed(2)}deg)`;
+      });
+
+      eyebrows.forEach((el) => {
+        el.style.opacity = Math.max(0, 1 - p * 2.5).toFixed(3);
+      });
+    };
+
+    const onScrollFly = () => {
+      if (!flyTick) {
+        flyTick = true;
+        requestAnimationFrame(updateFly);
+      }
+    };
+
+    const finishIntro = (anims: Animation[]) => {
+      if (introDone) return;
+      introDone = true;
+      root.classList.remove("intro");
+      anims.forEach((a) => a.cancel());
+      measureFly();
+      updateFly();
+    };
+
+    if (hero) {
+      flyTiles = Array.from(hero.querySelectorAll<HTMLElement>(".tile"));
+      eyebrows = Array.from(hero.querySelectorAll<HTMLElement>(".eyebrow"));
+
+      if (!introDone) {
+        const title = hero.querySelector<HTMLElement>(".hero-title");
+        if (title) {
+          const t = title.getBoundingClientRect();
+          const cx = t.left + t.width / 2;
+          const cy = t.top + t.height / 2;
+          const jit = [
+            [-14, 6],
+            [12, -8],
+            [-6, -12],
+            [10, 10],
+            [-10, 12],
+            [4, -4],
+          ];
+          const DEAL = 90;
+          const APPEAR = 520;
+          const HOLD = 260;
+          const SPREAD = 1050;
+          const FAN = 45;
+          const spreadAt = (flyTiles.length - 1) * DEAL + APPEAR + HOLD;
+          const anims: Animation[] = [];
+
+          flyTiles.forEach((el, i) => {
+            const r = el.getBoundingClientRect();
+            const dx = cx - (r.left + r.width / 2) + (jit[i]?.[0] || 0);
+            const dy = cy - (r.top + r.height / 2) + (jit[i]?.[1] || 0);
+            const start = i * DEAL;
+            const end = spreadAt + i * FAN + SPREAD;
+            const dur = end - start;
+            const stacked = `translate(${dx}px,${dy}px) rotate(${rot[i]}deg) scale(1.15)`;
+
+            anims.push(
+              el.animate(
+                [
+                  {
+                    offset: 0,
+                    opacity: 0,
+                    transform: `translate(${dx}px,${dy + 48}px) rotate(${rot[i] * 1.6}deg) scale(.85)`,
+                    easing: "cubic-bezier(.2,.7,.2,1)",
+                  },
+                  { offset: APPEAR / dur, opacity: 1, transform: stacked },
+                  {
+                    offset: (spreadAt + i * FAN - start) / dur,
+                    opacity: 1,
+                    transform: stacked,
+                    easing: "cubic-bezier(.7,0,.15,1)",
+                  },
+                  { offset: 1, opacity: 1, transform: "translate(0,0) rotate(0deg) scale(1)" },
+                ],
+                { duration: dur, delay: start, fill: "both" }
+              )
+            );
+          });
+
+          const textAt = spreadAt + SPREAD * 0.55;
+          hero.querySelectorAll<HTMLElement>(".hero-title span").forEach((el, i) => {
+            anims.push(
+              el.animate(
+                [
+                  { opacity: 0, transform: "translateY(32px)" },
+                  { opacity: 1, transform: "none" },
+                ],
+                { duration: 750, delay: textAt + i * 90, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both" }
+              )
+            );
+          });
+
+          hero.querySelectorAll<HTMLElement>(".hero-lines, .eyebrow").forEach((el) => {
+            anims.push(
+              el.animate([{ opacity: 0 }, { opacity: 1 }], {
+                duration: 800,
+                delay: spreadAt,
+                easing: "ease",
+                fill: "both",
+              })
+            );
+          });
+
+          Promise.all(anims.map((a) => a.finished))
+            .then(() => finishIntro(anims))
+            .catch(() => finishIntro(anims));
+
+          setTimeout(() => finishIntro(anims), 5500);
+        }
+      } else {
+        measureFly();
+        updateFly();
+      }
+
+      window.addEventListener("scroll", onScrollFly, { passive: true });
+      window.addEventListener("resize", () => {
+        measureFly();
+        updateFly();
+      });
+
+      // Pointermove smooth parallax
+      const fine = window.matchMedia("(pointer:fine)").matches;
+      if (fine) {
+        const onPointerMove = (e: PointerEvent) => {
+          if (!introDone) return;
+          const r = hero.getBoundingClientRect();
+          hero.style.setProperty("--mx", (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
+          hero.style.setProperty("--my", (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
+        };
+        const onPointerLeave = () => {
+          hero.style.setProperty("--mx", "0");
+          hero.style.setProperty("--my", "0");
+        };
+        hero.addEventListener("pointermove", onPointerMove);
+        hero.addEventListener("pointerleave", onPointerLeave);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 4. Reveal on scroll (IntersectionObserver)
+    // -------------------------------------------------------------
+    const reveals = document.querySelectorAll(".reveal");
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) {
+              en.target.classList.add("in");
+              io.unobserve(en.target);
+            }
+          });
+        },
+        { rootMargin: "0px 0px -10% 0px", threshold: 0.12 }
+      );
+      reveals.forEach((el) => io.observe(el));
+    } else {
+      reveals.forEach((el) => el.classList.add("in"));
+    }
+
+    // -------------------------------------------------------------
+    // 5. Curved Arc Gallery (Parabolic formula & scroll boost)
+    // -------------------------------------------------------------
+    const arcTrack = arcTrackRef.current;
+    let arcCancel: number | null = null;
+    if (arcTrack) {
+      const arcView = arcTrack.parentElement as HTMLElement;
+      let arcCards: HTMLElement[] = [];
+      let arcOffset = 0;
+      let arcLast = 0;
+      let arcOn = false;
+      let arcBoost = 0;
+      let arcStep = 0;
+      let arcTotal = 0;
+      let arcW = 0;
+      let arcCurve = 0;
+      let arcLastY = window.scrollY;
+      const arcCalm = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+      const ARC_GAP = 24;
+      const ARC_SPEED = 40;
+
+      const arcSetup = () => {
+        arcTrack.querySelectorAll(".arc-clone").forEach((c) => c.remove());
+        const originals = Array.from(arcTrack.children) as HTMLElement[];
+        if (!originals.length) return;
+        arcW = originals[0].offsetWidth || 300;
+        arcStep = arcW + ARC_GAP;
+        const need = arcView.clientWidth + arcStep * 2;
+        let total = originals.length * arcStep;
+        while (total < need) {
+          originals.forEach((c) => {
+            const k = c.cloneNode(true) as HTMLElement;
+            k.classList.add("arc-clone");
+            arcTrack.appendChild(k);
+          });
+          total += originals.length * arcStep;
+        }
+        arcCards = Array.from(arcTrack.children) as HTMLElement[];
+        arcTotal = arcCards.length * arcStep;
+        arcCurve = arcW * 0.42;
+      };
+
+      const arcRender = () => {
+        const half = arcView.clientWidth / 2;
+        const radius = Math.max(half, arcW * 1.6);
+        for (let i = 0; i < arcCards.length; i++) {
+          const x = (((i * arcStep + arcOffset) % arcTotal) + arcTotal) % arcTotal - arcStep;
+          const u = (x + arcW / 2 - half) / radius;
+          arcCards[i].style.transform = `translate3d(${x.toFixed(1)}px, ${(arcCurve * u * u).toFixed(
+            1
+          )}px, 0) rotate(${(u * 9).toFixed(2)}deg)`;
+        }
+      };
+
+      const arcTick = (t: number) => {
+        if (!arcOn) {
+          arcLast = 0;
+          return;
+        }
+        const dt = arcLast ? Math.min(t - arcLast, 64) / 1000 : 0;
+        arcLast = t;
+        arcOffset -= (ARC_SPEED + arcBoost) * dt;
+        arcBoost *= 0.94;
+        arcRender();
+        arcCancel = requestAnimationFrame(arcTick);
+      };
+
+      arcSetup();
+      arcRender();
+
+      window.addEventListener("resize", () => {
+        arcSetup();
+        arcRender();
+      });
+
+      if (!arcCalm) {
+        window.addEventListener(
+          "scroll",
+          () => {
+            const y = window.scrollY;
+            arcBoost = Math.min(500, arcBoost + Math.abs(y - arcLastY) * 3);
+            arcLastY = y;
+          },
+          { passive: true }
+        );
+
+        if ("IntersectionObserver" in window) {
+          new IntersectionObserver((entries) => {
+            const vis = entries[0].isIntersecting;
+            if (vis && !arcOn) {
+              arcOn = true;
+              requestAnimationFrame(arcTick);
+            } else if (!vis) {
+              arcOn = false;
+            }
+          }).observe(arcView);
+        } else {
+          arcOn = true;
+          requestAnimationFrame(arcTick);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 6. Stacking Animation: About -> Services
+    // -------------------------------------------------------------
+    const stack = stackRef.current;
+    if (stack) {
+      const about = stack.querySelector<HTMLElement>(".about");
+      const services = stack.querySelector<HTMLElement>(".services");
+      let stackTick = false;
+
+      const setStick = () => {
+        if (!about) return;
+        const t = Math.min(0, window.innerHeight - about.offsetHeight);
+        about.style.setProperty("--stick", `${t}px`);
+        about.style.setProperty("--origin", `${window.innerHeight / 2 - t}px`);
+      };
+
+      const updateStack = () => {
+        stackTick = false;
+        if (!about || !services) return;
+        const p = 1 - services.getBoundingClientRect().top / window.innerHeight;
+        about.style.setProperty("--p", Math.max(0, Math.min(1, p)).toFixed(3));
+      };
+
+      setStick();
+      updateStack();
+      window.addEventListener("resize", () => {
+        setStick();
+        updateStack();
+      });
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (!stackTick) {
+            stackTick = true;
+            requestAnimationFrame(updateStack);
+          }
+        },
+        { passive: true }
+      );
+    }
+
+    return () => {
+      window.removeEventListener("scroll", onScrollNav);
+      if (arcCancel) cancelAnimationFrame(arcCancel);
+    };
   }, []);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText("firmannaza307@gmail.com");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    const email = "firmannaza307@gmail.com";
+    const done = () => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(done, () => {
+        window.location.href = `mailto:${email}`;
+      });
+    } else {
+      window.location.href = `mailto:${email}`;
+    }
   };
 
   return (
     <>
-      {/* -------------------- NAVIGATION -------------------- */}
-      <header className={`nav ${scrolled ? "scrolled" : ""}`} id="nav">
+      {/* -------------------- HEADER / NAV -------------------- */}
+      <header className="nav" id="nav" ref={navRef}>
         <a className="nav-logo" href="#top">
           <svg
             viewBox="0 0 24 24"
@@ -112,15 +453,18 @@ export default function App() {
         <div className="nav-right">
           <a
             className="btn-primary nav-cta"
-            href="mailto:firmannaza307@gmail.com?subject=New%20Project%20Inquiry"
+            href="https://portofolionaza.steamcraft.online"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <span>Hire Me</span>
+            <span>SteamCraft</span>
             <ArrowUpRight size={15} />
           </a>
           <button
             className="nav-burger"
+            id="navBurger"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation menu"
+            aria-label="Menu"
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -129,7 +473,7 @@ export default function App() {
       </header>
 
       {/* Mobile Nav Panel */}
-      <div className={`nav-mobile-panel ${mobileMenuOpen ? "open" : ""}`}>
+      <div className={`nav-mobile-panel ${mobileMenuOpen ? "open" : ""}`} id="navPanel">
         <a href="#work" onClick={() => setMobileMenuOpen(false)}>Work</a>
         <a href="#about" onClick={() => setMobileMenuOpen(false)}>About</a>
         <a href="#services" onClick={() => setMobileMenuOpen(false)}>Services</a>
@@ -137,10 +481,12 @@ export default function App() {
         <hr />
         <a
           className="btn-primary"
-          href="mailto:firmannaza307@gmail.com?subject=New%20Project%20Inquiry"
+          href="https://portofolionaza.steamcraft.online"
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={() => setMobileMenuOpen(false)}
         >
-          <span>Hire Me</span>
+          <span>SteamCraft Ecosystem</span>
           <ArrowUpRight size={15} />
         </a>
       </div>
@@ -154,101 +500,52 @@ export default function App() {
             <i />
           </div>
 
-          {/* Floating Interactive Project Tiles */}
           <div className="tiles">
             {/* Tile 1 */}
             <div className="tile t1">
-              <div className="tile-inner">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "var(--primary)", fontWeight: 700, fontSize: "10px" }}>THIS ME</span>
-                  <span style={{ fontSize: "10px", color: "var(--neutral-500)" }}>BISINDO</span>
-                </div>
-                <div>
-                  <strong style={{ fontSize: "11px", color: "var(--ink)", display: "block" }}>
-                    Sign Language App
-                  </strong>
-                  <span style={{ fontSize: "9px", color: "var(--neutral-500)" }}>30+ Figma Screens</span>
-                </div>
+              <div className="ph ph-1">
+                <span>01 / This Me UI</span>
+                <strong>BISINDO Mobile App</strong>
               </div>
             </div>
 
             {/* Tile 2 */}
             <div className="tile t2">
-              <div className="tile-inner" style={{ background: "linear-gradient(135deg, #fff 0%, #DBE8FC 100%)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "var(--primary)", fontWeight: 700, fontSize: "10px" }}>STEAMCRAFT</span>
-                  <span style={{ fontSize: "10px", color: "var(--neutral-500)" }}>3D Studio</span>
-                </div>
-                <div>
-                  <strong style={{ fontSize: "11px", color: "var(--ink)", display: "block" }}>
-                    Simulation Lab UX
-                  </strong>
-                  <span style={{ fontSize: "9px", color: "var(--neutral-500)" }}>Interactive WebGL</span>
-                </div>
+              <div className="ph ph-2">
+                <span>02 / SteamSim Lab</span>
+                <strong>Interactive 3D Sim</strong>
               </div>
             </div>
 
             {/* Tile 3 */}
             <div className="tile t3">
-              <div className="tile-inner">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "var(--primary)", fontWeight: 700, fontSize: "10px" }}>A-KERE</span>
-                  <span style={{ fontSize: "10px", color: "var(--neutral-500)" }}>Fintech</span>
-                </div>
-                <div>
-                  <strong style={{ fontSize: "11px", color: "var(--ink)", display: "block" }}>
-                    Fast Expense Flow
-                  </strong>
-                  <span style={{ fontSize: "9px", color: "var(--neutral-500)" }}>-50% Input Time</span>
-                </div>
+              <div className="ph ph-3">
+                <span>03 / DIMAS TI 2025</span>
+                <strong>Medali Perak UI/UX</strong>
               </div>
             </div>
 
             {/* Tile 4 */}
             <div className="tile t4">
-              <div className="tile-inner" style={{ background: "linear-gradient(135deg, #fff 0%, #BADDFC 100%)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "var(--primary)", fontWeight: 700, fontSize: "10px" }}>DIMAS TI</span>
-                  <span style={{ fontSize: "10px", color: "var(--primary)", fontWeight: 600 }}>🥈 Perak</span>
-                </div>
-                <div>
-                  <strong style={{ fontSize: "11px", color: "var(--ink)", display: "block" }}>
-                    National Award
-                  </strong>
-                  <span style={{ fontSize: "9px", color: "var(--neutral-500)" }}>UI/UX Competition</span>
-                </div>
+              <div className="ph ph-4">
+                <span>04 / GEMASTIK XVIII</span>
+                <strong>Finalis UX Design</strong>
               </div>
             </div>
 
             {/* Tile 5 */}
             <div className="tile t5">
-              <div className="tile-inner">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "var(--primary)", fontWeight: 700, fontSize: "10px" }}>UNESA DATA</span>
-                  <span style={{ fontSize: "10px", color: "var(--neutral-500)" }}>GPA 3.80</span>
-                </div>
-                <div>
-                  <strong style={{ fontSize: "11px", color: "var(--ink)", display: "block" }}>
-                    Data-Driven UX
-                  </strong>
-                  <span style={{ fontSize: "9px", color: "var(--neutral-500)" }}>SUS Usability Score</span>
-                </div>
+              <div className="ph ph-5">
+                <span>05 / A-KERE</span>
+                <strong>Smart Finance Flow</strong>
               </div>
             </div>
 
             {/* Tile 6 */}
             <div className="tile t6">
-              <div className="tile-inner" style={{ background: "linear-gradient(135deg, #fff 0%, #E0EEFE 100%)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "var(--primary)", fontWeight: 700, fontSize: "10px" }}>GEMASTIK XVIII</span>
-                  <span style={{ fontSize: "10px", color: "var(--primary)" }}>Finalis</span>
-                </div>
-                <div>
-                  <strong style={{ fontSize: "11px", color: "var(--ink)", display: "block" }}>
-                    UX Design Division
-                  </strong>
-                  <span style={{ fontSize: "9px", color: "var(--neutral-500)" }}>Puspresnas 2025</span>
-                </div>
+              <div className="ph ph-6">
+                <span>06 / UNESA Sains Data</span>
+                <strong>GPA 3.80 / 4.00</strong>
               </div>
             </div>
           </div>
@@ -278,34 +575,44 @@ export default function App() {
         {/* -------------------- SELECTED WORKS -------------------- */}
         <section className="section work" id="work">
           <div className="container wide">
-            <div className="display-head">
+            <div className="display-head reveal">
               <h2 className="display-title">
                 Selected works<sup className="display-count">(04)</sup>
               </h2>
               <div className="display-sub-row">
                 <p className="display-sub">2024 – 2026</p>
                 <div className="clients">
-                  <div className="award-badge-pill">
-                    <Award size={16} className="text-primary" />
-                    <span>Juara 2 DIMAS TI &amp; Finalis GEMASTIK XVIII</span>
+                  <div className="flag-stack" role="list" aria-label="Achievements and credentials">
+                    <span className="flag" role="listitem" style={{ "--i": 0 } as React.CSSProperties} data-name="Medali Perak DIMAS TI">
+                      🥈
+                    </span>
+                    <span className="flag" role="listitem" style={{ "--i": 1 } as React.CSSProperties} data-name="Finalis GEMASTIK XVIII">
+                      🏆
+                    </span>
+                    <span className="flag" role="listitem" style={{ "--i": 2 } as React.CSSProperties} data-name="UNESA Sains Data GPA 3.80">
+                      🎓
+                    </span>
+                    <span className="flag" role="listitem" style={{ "--i": 3 } as React.CSSProperties} data-name="PUSPRESNAS OSN 2x">
+                      🏅
+                    </span>
                   </div>
-                  <div className="award-badge-pill">
-                    <Sparkles size={16} className="text-primary" />
-                    <span>UNESA Sains Data</span>
-                  </div>
+                  <p className="clients-caption">
+                    <strong>National UI/UX Recognition</strong>
+                    <span>Validated by design competitions</span>
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="works-list">
-              {/* Work 01 */}
-              <article className="work-row" id="project-01">
+              {/* Project 01 */}
+              <article className="work-row reveal" id="project-01">
                 <div className="work-info">
                   <h3>This Me</h3>
                   <p className="work-tags">Product design · Inclusive App Design</p>
                   <p className="work-desc">
-                    A gamified Indonesian Sign Language (BISINDO) interactive learning app featuring 30+
-                    Figma interfaces, comprehensive component design systems, and inclusive usability research for the Deaf community.
+                    An interactive Indonesian Sign Language (BISINDO) learning app featuring 30+ Figma
+                    interfaces, gamified camera recognition, and inclusive UX for the Deaf community.
                   </p>
                   <a
                     className="btn-secondary"
@@ -318,45 +625,34 @@ export default function App() {
                 </div>
                 <div className="work-shots">
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">01 / Onboarding</span>
-                      <span className="text-[10px] text-neutral-500">BISINDO Flow</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Gesture Gamification</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Guided camera learning with high-contrast feedback</p>
-                    </div>
-                  </div>
-                  <div className="shot" style={{ background: "linear-gradient(135deg, #fff 0%, #DBE8FC 100%)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">02 / Design System</span>
-                      <span className="text-[10px] text-neutral-500">Figma Tokens</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Modular Components</strong>
-                      <p className="text-xs text-neutral-500 mt-1">WCAG 2.1 accessible color palette &amp; typography</p>
+                    <div className="ph ph-1">
+                      <span>01 / Onboarding Flow</span>
+                      <strong>Gesture Gamification</strong>
                     </div>
                   </div>
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">03 / Usability</span>
-                      <span className="text-[10px] text-emerald-600 font-semibold">SUS 92.5</span>
+                    <div className="ph ph-alt-a">
+                      <span>02 / Design System</span>
+                      <strong>Figma Auto-Layout &amp; Tokens</strong>
                     </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">User Testing Validated</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Silver Medalist DIMAS TI 2025</p>
+                  </div>
+                  <div className="shot">
+                    <div className="ph ph-alt-b">
+                      <span>03 / Usability Study</span>
+                      <strong>SUS Score 92.5 (Silver Medal)</strong>
                     </div>
                   </div>
                 </div>
               </article>
 
-              {/* Work 02 */}
-              <article className="work-row" id="project-02">
+              {/* Project 02 */}
+              <article className="work-row reveal" id="project-02">
                 <div className="work-info">
                   <h3>SteamCraft Ecosystem</h3>
                   <p className="work-tags">Product design · 3D Simulation &amp; Web App</p>
                   <p className="work-desc">
-                    Interactive virtual science simulation studio (SteamSim Lab) and generative 3D parametric modeling canvas (MakerCraft 3D) engineered for complex multi-parameter workbench controls.
+                    An interactive science simulation lab (SteamSim) and generative 3D modeling canvas
+                    (MakerCraft 3D) engineered with complex parameter workbench controls.
                   </p>
                   <a
                     className="btn-secondary"
@@ -364,130 +660,96 @@ export default function App() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    View platform <ArrowRight size={15} />
+                    View work <ArrowRight size={15} />
                   </a>
                 </div>
                 <div className="work-shots">
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">01 / SteamSim Lab</span>
-                      <span className="text-[10px] text-neutral-500">sim.steamcraft.online</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Physics &amp; Chemistry Studio</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Real-time parameters and interactive graph curves</p>
-                    </div>
-                  </div>
-                  <div className="shot" style={{ background: "linear-gradient(135deg, #fff 0%, #E0EEFE 100%)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">02 / MakerCraft 3D</span>
-                      <span className="text-[10px] text-neutral-500">maker.steamcraft.online</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Parametric 3D Canvas</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Torus knot, Möbius strip &amp; OBJ 3D print export</p>
+                    <div className="ph ph-2">
+                      <span>01 / SteamSim Lab</span>
+                      <strong>Physics &amp; Chemistry Studio</strong>
                     </div>
                   </div>
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">03 / Architecture</span>
-                      <span className="text-[10px] text-neutral-500">Lead System Architect</span>
+                    <div className="ph ph-alt-a">
+                      <span>02 / MakerCraft 3D</span>
+                      <strong>Generative Math 3D Canvas</strong>
                     </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Multi-Subdomain Ecosystem</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Ergonomic dark-mode scientific workbench</p>
+                  </div>
+                  <div className="shot">
+                    <div className="ph ph-alt-b">
+                      <span>03 / Ecosystem</span>
+                      <strong>Multi-Subdomain Architecture</strong>
                     </div>
                   </div>
                 </div>
               </article>
 
-              {/* Work 03 */}
-              <article className="work-row" id="project-03">
+              {/* Project 03 */}
+              <article className="work-row reveal" id="project-03">
                 <div className="work-info">
                   <h3>A-KERE</h3>
                   <p className="work-tags">App design · Fintech Mobile UX</p>
                   <p className="work-desc">
-                    A streamlined personal budgeting and finance tracking app designed to eliminate friction in daily transaction logging, cutting user input time by 50% with intuitive visualization.
+                    A streamlined personal budgeting application that cuts transaction logging steps by
+                    50% through rapid-input flow and visual cash flow distribution.
                   </p>
                   <a className="btn-secondary" href="#contact">
-                    View case study <ArrowRight size={15} />
+                    View work <ArrowRight size={15} />
                   </a>
                 </div>
                 <div className="work-shots">
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">01 / Quick-Log</span>
-                      <span className="text-[10px] text-neutral-500">Fast Flow</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">3-Second Input Flow</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Smart category prediction &amp; numeric shortcuts</p>
-                    </div>
-                  </div>
-                  <div className="shot" style={{ background: "linear-gradient(135deg, #fff 0%, #BADDFC 100%)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">02 / Analytics</span>
-                      <span className="text-[10px] text-neutral-500">Dashboard</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Visual Budget Breakdown</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Color-coded daily, weekly and monthly envelopes</p>
+                    <div className="ph ph-3">
+                      <span>01 / Fast Transaction</span>
+                      <strong>3-Second Input Flow</strong>
                     </div>
                   </div>
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">03 / Efficiency</span>
-                      <span className="text-[10px] text-emerald-600 font-semibold">+50% Faster</span>
+                    <div className="ph ph-alt-a">
+                      <span>02 / Budget Envelopes</span>
+                      <strong>Real-Time Cash Analytics</strong>
                     </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Frictionless Experience</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Built with young professionals in mind</p>
+                  </div>
+                  <div className="shot">
+                    <div className="ph ph-alt-b">
+                      <span>03 / Usability Test</span>
+                      <strong>50% Time Saved</strong>
                     </div>
                   </div>
                 </div>
               </article>
 
-              {/* Work 04 */}
-              <article className="work-row" id="project-04">
+              {/* Project 04 */}
+              <article className="work-row reveal" id="project-04">
                 <div className="work-info">
                   <h3>Naza Cell POS</h3>
                   <p className="work-tags">Product design · Enterprise Retail System</p>
                   <p className="work-desc">
-                    Cashier POS interface and inventory management system designed for 100+ stock-keeping units (SKUs) and dozens of high-frequency daily digital financial transactions (PPOB, pulses, e-money).
+                    High-efficiency cashier POS interface and multi-supplier inventory management platform
+                    handling 100+ SKUs and continuous daily financial transactions.
                   </p>
                   <a className="btn-secondary" href="#contact">
-                    View system <ArrowRight size={15} />
+                    View work <ArrowRight size={15} />
                   </a>
                 </div>
                 <div className="work-shots">
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">01 / Cashier Terminal</span>
-                      <span className="text-[10px] text-neutral-500">High Speed</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Keyboard-Driven Checkout</strong>
-                      <p className="text-xs text-neutral-500 mt-1">50-80 transactions processed daily</p>
-                    </div>
-                  </div>
-                  <div className="shot" style={{ background: "linear-gradient(135deg, #fff 0%, #DBE8FC 100%)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">02 / Inventory Matrix</span>
-                      <span className="text-[10px] text-neutral-500">100+ SKUs</span>
-                    </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">Multi-Supplier Tracking</strong>
-                      <p className="text-xs text-neutral-500 mt-1">100% stock availability guarantee</p>
+                    <div className="ph ph-4">
+                      <span>01 / Cashier POS</span>
+                      <strong>Keyboard-Driven Checkout</strong>
                     </div>
                   </div>
                   <div className="shot">
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span className="font-mono text-xs font-semibold text-primary">03 / Operations</span>
-                      <span className="text-[10px] text-neutral-500">Since 2019</span>
+                    <div className="ph ph-alt-a">
+                      <span>02 / Inventory Matrix</span>
+                      <strong>100+ SKU Tracking</strong>
                     </div>
-                    <div>
-                      <strong className="text-sm font-semibold text-ink">End-to-End Business Flow</strong>
-                      <p className="text-xs text-neutral-500 mt-1">Integrated digital financial services</p>
+                  </div>
+                  <div className="shot">
+                    <div className="ph ph-alt-b">
+                      <span>03 / Operations</span>
+                      <strong>50-80 Daily Transactions</strong>
                     </div>
                   </div>
                 </div>
@@ -496,51 +758,49 @@ export default function App() {
           </div>
         </section>
 
-        {/* -------------------- CURVED ARC CAROUSEL -------------------- */}
+        {/* -------------------- CURVED ARC GALLERY -------------------- */}
         <section className="arc" aria-label="More explorations">
-          <div className="container wide arc-head">
-            <div>
-              <h3>More explorations</h3>
-              <p>Design systems, UI prototypes, and academic research experiments.</p>
-            </div>
+          <div className="container wide arc-head reveal">
+            <h3>More explorations</h3>
+            <p>Concepts, side projects, and data science experiments.</p>
           </div>
 
           <div className="arc-viewport" aria-hidden="true">
-            <div
-              className="arc-track"
-              ref={arcTrackRef}
-              style={{ display: "flex", gap: "24px", willChange: "transform" }}
-            >
-              {[
-                { title: "ThisMe BISINDO", tag: "Figma UI / Gesture", color: "#DBE8FC" },
-                { title: "SteamSim Lab", tag: "3D Parametric Canvas", color: "#BADDFC" },
-                { title: "Cyberbullying Model", tag: "NLP & Logistic Reg", color: "#E0EEFE" },
-                { title: "MakerCraft 3D", tag: "Generative Math Art", color: "#DBE8FC" },
-                { title: "Spatial Dengue GWR", tag: "Geo Data Science", color: "#BADDFC" },
-                { title: "A-KERE Finance", tag: "Mobile Prototyping", color: "#E0EEFE" },
-                { title: "ThisMe BISINDO", tag: "Figma UI / Gesture", color: "#DBE8FC" },
-                { title: "SteamSim Lab", tag: "3D Parametric Canvas", color: "#BADDFC" },
-              ].map((item, idx) => (
-                <div
-                  key={idx}
-                  className="arc-card"
-                  style={{
-                    position: "relative",
-                    flex: "0 0 320px",
-                    background: item.color,
-                  }}
-                >
-                  <span className="font-mono text-xs font-semibold text-primary">{item.tag}</span>
-                  <div>
-                    <strong className="text-base font-bold text-ink block">{item.title}</strong>
-                    <span className="text-xs text-neutral-500">Naza Firmansyah Portfolio</span>
-                  </div>
-                </div>
-              ))}
+            <div className="arc-track" id="arcTrack" ref={arcTrackRef}>
+              <div className="arc-card">
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>THIS ME UI</span>
+                <strong>Gesture Gamification App</strong>
+                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>30+ Figma Interfaces</span>
+              </div>
+              <div className="arc-card">
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>STEAMSIM LAB</span>
+                <strong>Virtual Science Simulation</strong>
+                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>sim.steamcraft.online</span>
+              </div>
+              <div className="arc-card">
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>MAKERCRAFT 3D</span>
+                <strong>Parametric 3D Art Studio</strong>
+                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>maker.steamcraft.online</span>
+              </div>
+              <div className="arc-card">
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>A-KERE FINANCE</span>
+                <strong>Frictionless Expense Logging</strong>
+                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>Mobile Prototyping</span>
+              </div>
+              <div className="arc-card">
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>CYBERBULLYING NLP</span>
+                <strong>93% Accuracy Model</strong>
+                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>3,000+ Text Datasets</span>
+              </div>
+              <div className="arc-card">
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>SPATIAL DENGUE GWR</span>
+                <strong>East Java Geodata Science</strong>
+                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>Geographic Regression</span>
+              </div>
             </div>
           </div>
 
-          <div className="arc-cta">
+          <div className="arc-cta reveal">
             <div className="arc-cta-text">
               <div>
                 <strong>Like what you see?</strong>
@@ -549,21 +809,20 @@ export default function App() {
             </div>
             <div className="arc-cta-btns">
               <a className="btn-primary" href="#contact">
-                Contact me <ArrowRight size={16} />
+                Contact me <ArrowRight size={15} />
               </a>
               <a
                 className="btn-secondary"
                 href="mailto:firmannaza307@gmail.com?subject=CV%20Request"
               >
-                Request CV <ArrowUpRight size={16} />
+                Request CV <ArrowUpRight size={15} />
               </a>
             </div>
           </div>
         </section>
 
         {/* -------------------- STACKING (ABOUT + SERVICES) -------------------- */}
-        <div className="stack">
-          {/* About Section */}
+        <div className="stack" ref={stackRef}>
           <section className="about" id="about">
             <div className="meet">
               <figure className="meet-photo">
@@ -573,48 +832,49 @@ export default function App() {
                 </p>
                 <div className="meet-roles">
                   <p>
-                    UI/UX Designer
+                    Product designer
                     <br />
-                    Data Science Student (UNESA)
+                    UI/UX researcher
                     <br />
-                    Product Thinker
+                    Data science student
                     <br />
-                    System Architect
+                    System architect
                   </p>
                 </div>
               </figure>
 
               <div className="meet-panel">
                 <div className="meet-content">
-                  <h2 className="meet-title">
+                  <h2 className="meet-title reveal" style={{ "--rd": "80ms" } as React.CSSProperties}>
                     <span>Meet</span>
                     <span>Naza Firmansyah</span>
                   </h2>
-                  <p className="meet-role">
-                    <strong>UI/UX Designer &amp; Data Science Student</strong>
-                    <span>/ Strategy &times; UX &times; Data &times; Product</span>
+                  <p className="meet-role reveal" style={{ "--rd": "140ms" } as React.CSSProperties}>
+                    <strong>Product designer &amp; Data Science student</strong>
+                    <span>/ Strategy &times; Design &times; Data &times; Development</span>
                   </p>
-                  <blockquote className="meet-quote">
+                  <blockquote className="meet-quote reveal" style={{ "--rd": "200ms" } as React.CSSProperties}>
                     <p className="meet-lead">
                       I turn complex data and user needs into intuitive digital products.
                     </p>
                     <p>
                       Sebagai mahasiswa Sains Data di Universitas Negeri Surabaya (IPK 3.80), saya bekerja
-                      pada titik temu antara presisi analitik data kuantitatif dan empati desain antarmuka manusia.
+                      pada persimpangan antara logika analitik data kuantitatif dan empati desain manusia &mdash;
+                      mentransformasi gagasan awal menjadi antarmuka intuitif dan produk yang terukur.
                     </p>
                     <p>
-                      Mulai dari riset pengguna, wireframing, pembentukan sistem desain modular di Figma, hingga
-                      pengujian kegunaan (SUS Score), saya memastikan setiap interaksi didukung oleh data nyata.
+                      Di luar desain estetis, saya memanfaatkan analisis perilaku pengguna dan metodologi riset
+                      (SUS Benchmarking) untuk memvalidasi bahwa setiap keputusan desain terbukti efektif.
                     </p>
                   </blockquote>
-                  <ul className="meet-skills">
+                  <ul className="meet-skills reveal" style={{ "--rd": "260ms" } as React.CSSProperties}>
                     <li>
                       <span className="skill-art">🎯</span>
                       <span>Strategy</span>
                     </li>
                     <li>
                       <span className="skill-art">🎨</span>
-                      <span>UI/UX</span>
+                      <span>Design</span>
                     </li>
                     <li>
                       <span className="skill-art">📊</span>
@@ -630,19 +890,18 @@ export default function App() {
             </div>
           </section>
 
-          {/* Services Section */}
           <section className="section services" id="services">
             <div className="container wide">
-              <div className="display-head">
+              <div className="display-head reveal">
                 <h2 className="display-title">
                   Services<sup className="display-count">(06)</sup>
                 </h2>
               </div>
 
               <div className="service-list">
-                <a className="service-row" href="#contact">
+                <a className="service-row reveal" href="#contact">
                   <span className="service-num">(01)</span>
-                  <h3 className="service-name">Product strategy &amp; research</h3>
+                  <h3 className="service-name">Product strategy</h3>
                   <p className="service-desc">
                     Turning business goals and user behaviors into clear product roadmaps through user interviews, empathy mapping, and information architecture.
                   </p>
@@ -651,42 +910,42 @@ export default function App() {
                   </span>
                 </a>
 
-                <a className="service-row" href="#contact">
+                <a className="service-row reveal" href="#contact" style={{ "--rd": "80ms" } as React.CSSProperties}>
                   <span className="service-num">(02)</span>
                   <h3 className="service-name">UI/UX &amp; product design</h3>
                   <p className="service-desc">
-                    Designing seamless digital experiences through user flows, wireframes, high-fidelity interfaces, and interactive Figma prototypes.
+                    Designing seamless digital experiences through user journeys, wireframes, high-fidelity interfaces, and interactive prototypes.
                   </p>
                   <span className="service-arrow">
                     <ArrowRight size={18} />
                   </span>
                 </a>
 
-                <a className="service-row" href="#contact">
+                <a className="service-row reveal" href="#contact" style={{ "--rd": "160ms" } as React.CSSProperties}>
                   <span className="service-num">(03)</span>
-                  <h3 className="service-name">Mobile application design</h3>
+                  <h3 className="service-name">Web &amp; dashboard design</h3>
                   <p className="service-desc">
-                    Crafting intuitive iOS and Android applications with thoughtful micro-interactions, accessibility guidelines (WCAG), and responsive layouts.
+                    Creating modern, responsive websites, retail POS dashboards, and data visualization tools balancing visual clarity with dense information.
                   </p>
                   <span className="service-arrow">
                     <ArrowRight size={18} />
                   </span>
                 </a>
 
-                <a className="service-row" href="#contact">
+                <a className="service-row reveal" href="#contact">
                   <span className="service-num">(04)</span>
-                  <h3 className="service-name">Web &amp; dashboard systems</h3>
+                  <h3 className="service-name">App design</h3>
                   <p className="service-desc">
-                    Creating modern web applications, retail POS dashboards, and data visualization tools balancing visual clarity with dense information.
+                    Crafting user-friendly mobile applications with thoughtful micro-interactions, WCAG accessibility, and frictionless checkout flows.
                   </p>
                   <span className="service-arrow">
                     <ArrowRight size={18} />
                   </span>
                 </a>
 
-                <a className="service-row" href="#contact">
+                <a className="service-row reveal" href="#contact" style={{ "--rd": "80ms" } as React.CSSProperties}>
                   <span className="service-num">(05)</span>
-                  <h3 className="service-name">Design systems &amp; tokens</h3>
+                  <h3 className="service-name">Design systems</h3>
                   <p className="service-desc">
                     Building scalable Figma token architectures, reusable component variants, and consistent visual guidelines that accelerate development.
                   </p>
@@ -695,9 +954,9 @@ export default function App() {
                   </span>
                 </a>
 
-                <a className="service-row" href="#contact">
+                <a className="service-row reveal" href="#contact" style={{ "--rd": "160ms" } as React.CSSProperties}>
                   <span className="service-num">(06)</span>
-                  <h3 className="service-name">Usability &amp; data validation</h3>
+                  <h3 className="service-name">Data &amp; usability evaluation</h3>
                   <p className="service-desc">
                     Validating digital products through System Usability Scale (SUS) benchmarking, qualitative user feedback, and data-informed iterations.
                   </p>
@@ -713,7 +972,7 @@ export default function App() {
         {/* -------------------- CONTACT SECTION -------------------- */}
         <section className="section contact" id="contact">
           <div className="container wide">
-            <div className="cta-panel">
+            <div className="cta-panel reveal">
               <p className="eyebrow">
                 Let&rsquo;s
                 <br />
@@ -733,12 +992,13 @@ export default function App() {
                 <a
                   className="btn-primary"
                   id="startProject"
-                  href="mailto:firmannaza307@gmail.com?subject=New%20Project%20Inquiry"
+                  ref={startProjectRef}
+                  href="mailto:firmannaza307@gmail.com?subject=New%20project%20inquiry"
                 >
                   Start a project <ArrowRight size={16} />
                 </a>
                 <button
-                  className="btn-secondary"
+                  className={`btn-secondary ${copied ? "copied" : ""}`}
                   type="button"
                   id="copyEmail"
                   onClick={handleCopy}
@@ -758,19 +1018,19 @@ export default function App() {
                 <div>
                   <span className="cta-label">Socials</span>
                   <div className="socials">
-                    <a href="https://linkedin.com/in/nazafirman" target="_blank" rel="noopener">
+                    <a href="https://linkedin.com/in/nazafirman" target="_blank" rel="noopener noreferrer">
                       LinkedIn <ArrowUpRight size={12} />
                     </a>
-                    <a href="https://github.com/nazaa-arch" target="_blank" rel="noopener">
+                    <a href="https://github.com/nazaa-arch" target="_blank" rel="noopener noreferrer">
                       GitHub <ArrowUpRight size={12} />
                     </a>
-                    <a href="https://wa.me/6285236019625" target="_blank" rel="noopener">
+                    <a href="https://wa.me/6285236019625" target="_blank" rel="noopener noreferrer">
                       WhatsApp <ArrowUpRight size={12} />
                     </a>
                     <a
                       href="https://portofolionaza.steamcraft.online"
                       target="_blank"
-                      rel="noopener"
+                      rel="noopener noreferrer"
                     >
                       SteamCraft <ArrowUpRight size={12} />
                     </a>
