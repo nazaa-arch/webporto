@@ -4,34 +4,62 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --primary: #1066FF;
+    --primary-hover: #0A5AF0;
+    --primary-container: #DBE8FC;
+    --ink: #0F172A;
+    --surface: #FFFFFF;
+    --background: #F5F8FE;
+    --sky-wash: #E0EEFE;
+    --sky-glow: #BADDFC;
+  }
+
   html {
     scroll-behavior: smooth;
-    color-scheme: dark;
   }
+
   body {
-    background-color: #000319;
-    color: #ffffff;
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    background-color: #F5F8FE;
+    color: #0F172A;
+    font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
     margin: 0;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: #1066FF;
+    color: #FFFFFF;
   }
 }
 
 @layer utilities {
-  .bg-grid-white {
-    background-size: 50px 50px;
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  .bg-grid-ariq {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(16, 102, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(16, 102, 255, 0.04) 1px, transparent 1px);
   }
 
-  .bg-grid-small-white {
+  .bg-dot-ariq {
     background-size: 24px 24px;
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(16, 102, 255, 0.08) 1.5px, transparent 1.5px);
   }
 
-  .bg-dot-white {
-    background-size: 24px 24px;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  .glass-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+  }
+
+  .glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .glass-card-hover:hover {
+    border-color: rgba(16, 102, 255, 0.35);
+    box-shadow: 0 16px 36px -12px rgba(16, 102, 255, 0.16);
+    transform: translateY(-2px);
   }
 }
