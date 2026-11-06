@@ -1,6 +1,148 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, Copy, Menu, X } from "lucide-react";
 
+/* -------------------------------------------------------------------------- */
+/*              3D INTERACTIVE CARD CONTAINER (ZYXKOO.DEV STYLE)              */
+/* -------------------------------------------------------------------------- */
+
+function Card3D({
+  children,
+  className = "",
+  maxTilt = 7,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  maxTilt?: number;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [glare, setGlare] = useState({ x: 50, y: 50 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotX = -((y - centerY) / centerY) * maxTilt;
+    const rotY = ((x - centerX) / centerX) * maxTilt;
+
+    setRotate({ x: rotX, y: rotY });
+    setGlare({
+      x: (x / rect.width) * 100,
+      y: (y / rect.height) * 100,
+    });
+  };
+
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setRotate({ x: 0, y: 0 });
+  };
+
+  return (
+    <div className="card-3d-wrapper">
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          transform: isHovered
+            ? `rotateX(${rotate.x.toFixed(2)}deg) rotateY(${rotate.y.toFixed(2)}deg) translateZ(10px)`
+            : "rotateX(0deg) rotateY(0deg) translateZ(0px)",
+          transition: isHovered
+            ? "transform 0.08s ease-out"
+            : "transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1)",
+          transformStyle: "preserve-3d",
+        }}
+        className={`card-3d-panel ${className}`}
+      >
+        {isHovered && (
+          <div
+            className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] transition-opacity duration-200"
+            style={{
+              background: `radial-gradient(circle 480px at ${glare.x}% ${glare.y}%, rgba(16, 102, 255, 0.12), transparent 75%)`,
+            }}
+          />
+        )}
+        <div
+          style={{
+            transform: isHovered ? "translateZ(18px)" : "translateZ(0px)",
+            transition: "transform 0.2s ease",
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*              3D SHOT PREVIEW CARD (CURSOR TRACKING TILT)                   */
+/* -------------------------------------------------------------------------- */
+
+function ShotCard3D({
+  children,
+  className = "",
+  style = {},
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const shotRef = useRef<HTMLDivElement>(null);
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!shotRef.current) return;
+    const rect = shotRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotX = -((y - centerY) / centerY) * 12;
+    const rotY = ((x - centerX) / centerX) * 12;
+
+    setRotate({ x: rotX, y: rotY });
+  };
+
+  return (
+    <div
+      ref={shotRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setRotate({ x: 0, y: 0 });
+      }}
+      style={{
+        ...style,
+        transform: isHovered
+          ? `rotateX(${rotate.x.toFixed(2)}deg) rotateY(${rotate.y.toFixed(2)}deg) scale(1.04) translateZ(16px)`
+          : "rotateX(0deg) rotateY(0deg) scale(1) translateZ(0px)",
+        transition: isHovered
+          ? "transform 0.08s ease-out, box-shadow 0.2s ease"
+          : "transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.4s ease",
+        transformStyle: "preserve-3d",
+      }}
+      className={`shot ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              MAIN APP COMPONENT                            */
+/* -------------------------------------------------------------------------- */
+
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -220,7 +362,7 @@ export default function App() {
         updateFly();
       });
 
-      // Pointermove smooth parallax
+      // Pointermove smooth parallax for hero tiles
       const fine = window.matchMedia("(pointer:fine)").matches;
       if (fine) {
         const onPointerMove = (e: PointerEvent) => {
@@ -572,7 +714,7 @@ export default function App() {
           </p>
         </section>
 
-        {/* -------------------- SELECTED WORKS -------------------- */}
+        {/* -------------------- SELECTED WORKS (3D MOUSE TRACKING) -------------------- */}
         <section className="section work" id="work">
           <div className="container wide">
             <div className="display-head reveal">
@@ -605,155 +747,171 @@ export default function App() {
             </div>
 
             <div className="works-list">
-              {/* Project 01 */}
-              <article className="work-row reveal" id="project-01">
-                <div className="work-info">
-                  <h3>This Me</h3>
-                  <p className="work-tags">Product design · Inclusive App Design</p>
-                  <p className="work-desc">
-                    An interactive Indonesian Sign Language (BISINDO) learning app featuring 30+ Figma
-                    interfaces, gamified camera recognition, and inclusive UX for the Deaf community.
-                  </p>
-                  <a
-                    className="btn-secondary"
-                    href="https://github.com/nazaa-arch/webporto"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    View work <ArrowRight size={15} />
-                  </a>
-                </div>
-                <div className="work-shots">
-                  <div className="shot">
-                    <div className="ph ph-1">
-                      <span>01 / Onboarding Flow</span>
-                      <strong>Gesture Gamification</strong>
+              {/* Project 01: This Me */}
+              <div className="reveal" id="project-01">
+                <Card3D maxTilt={7}>
+                  <article className="work-row">
+                    <div className="work-info">
+                      <h3>This Me</h3>
+                      <p className="work-tags">Product design · Inclusive App Design</p>
+                      <p className="work-desc">
+                        An interactive Indonesian Sign Language (BISINDO) learning app featuring 30+ Figma
+                        interfaces, gamified camera recognition, and inclusive UX for the Deaf community.
+                      </p>
+                      <a
+                        className="btn-secondary"
+                        href="https://github.com/nazaa-arch/webporto"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View work <ArrowRight size={15} />
+                      </a>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-a">
-                      <span>02 / Design System</span>
-                      <strong>Figma Auto-Layout &amp; Tokens</strong>
+                    <div className="work-shots">
+                      <ShotCard3D>
+                        <div className="ph ph-1">
+                          <span>01 / Onboarding Flow</span>
+                          <strong>Gesture Gamification</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-a">
+                          <span>02 / Design System</span>
+                          <strong>Figma Auto-Layout &amp; Tokens</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-b">
+                          <span>03 / Usability Study</span>
+                          <strong>SUS Score 92.5 (Silver Medal)</strong>
+                        </div>
+                      </ShotCard3D>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-b">
-                      <span>03 / Usability Study</span>
-                      <strong>SUS Score 92.5 (Silver Medal)</strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
+                  </article>
+                </Card3D>
+              </div>
 
-              {/* Project 02 */}
-              <article className="work-row reveal" id="project-02">
-                <div className="work-info">
-                  <h3>SteamCraft Ecosystem</h3>
-                  <p className="work-tags">Product design · 3D Simulation &amp; Web App</p>
-                  <p className="work-desc">
-                    An interactive science simulation lab (SteamSim) and generative 3D modeling canvas
-                    (MakerCraft 3D) engineered with complex parameter workbench controls.
-                  </p>
-                  <a
-                    className="btn-secondary"
-                    href="https://portofolionaza.steamcraft.online"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    View work <ArrowRight size={15} />
-                  </a>
-                </div>
-                <div className="work-shots">
-                  <div className="shot">
-                    <div className="ph ph-2">
-                      <span>01 / SteamSim Lab</span>
-                      <strong>Physics &amp; Chemistry Studio</strong>
+              {/* Project 02: SteamCraft */}
+              <div className="reveal" id="project-02">
+                <Card3D maxTilt={7}>
+                  <article className="work-row">
+                    <div className="work-info">
+                      <h3>SteamCraft Ecosystem</h3>
+                      <p className="work-tags">Product design · 3D Simulation &amp; Web App</p>
+                      <p className="work-desc">
+                        An interactive science simulation lab (SteamSim) and generative 3D modeling canvas
+                        (MakerCraft 3D) engineered with complex parameter workbench controls.
+                      </p>
+                      <a
+                        className="btn-secondary"
+                        href="https://portofolionaza.steamcraft.online"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View platform <ArrowRight size={15} />
+                      </a>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-a">
-                      <span>02 / MakerCraft 3D</span>
-                      <strong>Generative Math 3D Canvas</strong>
+                    <div className="work-shots">
+                      <ShotCard3D>
+                        <div className="ph ph-2">
+                          <span>01 / SteamSim Lab</span>
+                          <strong>Physics &amp; Chemistry Studio</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-a">
+                          <span>02 / MakerCraft 3D</span>
+                          <strong>Generative Math 3D Canvas</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-b">
+                          <span>03 / Ecosystem</span>
+                          <strong>Multi-Subdomain Architecture</strong>
+                        </div>
+                      </ShotCard3D>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-b">
-                      <span>03 / Ecosystem</span>
-                      <strong>Multi-Subdomain Architecture</strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
+                  </article>
+                </Card3D>
+              </div>
 
-              {/* Project 03 */}
-              <article className="work-row reveal" id="project-03">
-                <div className="work-info">
-                  <h3>A-KERE</h3>
-                  <p className="work-tags">App design · Fintech Mobile UX</p>
-                  <p className="work-desc">
-                    A streamlined personal budgeting application that cuts transaction logging steps by
-                    50% through rapid-input flow and visual cash flow distribution.
-                  </p>
-                  <a className="btn-secondary" href="#contact">
-                    View work <ArrowRight size={15} />
-                  </a>
-                </div>
-                <div className="work-shots">
-                  <div className="shot">
-                    <div className="ph ph-3">
-                      <span>01 / Fast Transaction</span>
-                      <strong>3-Second Input Flow</strong>
+              {/* Project 03: A-KERE */}
+              <div className="reveal" id="project-03">
+                <Card3D maxTilt={7}>
+                  <article className="work-row">
+                    <div className="work-info">
+                      <h3>A-KERE</h3>
+                      <p className="work-tags">App design · Fintech Mobile UX</p>
+                      <p className="work-desc">
+                        A streamlined personal budgeting application that cuts transaction logging steps by
+                        50% through rapid-input flow and visual cash flow distribution.
+                      </p>
+                      <a className="btn-secondary" href="#contact">
+                        View case study <ArrowRight size={15} />
+                      </a>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-a">
-                      <span>02 / Budget Envelopes</span>
-                      <strong>Real-Time Cash Analytics</strong>
+                    <div className="work-shots">
+                      <ShotCard3D>
+                        <div className="ph ph-3">
+                          <span>01 / Fast Transaction</span>
+                          <strong>3-Second Input Flow</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-a">
+                          <span>02 / Budget Envelopes</span>
+                          <strong>Real-Time Cash Analytics</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-b">
+                          <span>03 / Usability Test</span>
+                          <strong>50% Time Saved</strong>
+                        </div>
+                      </ShotCard3D>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-b">
-                      <span>03 / Usability Test</span>
-                      <strong>50% Time Saved</strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
+                  </article>
+                </Card3D>
+              </div>
 
-              {/* Project 04 */}
-              <article className="work-row reveal" id="project-04">
-                <div className="work-info">
-                  <h3>Naza Cell POS</h3>
-                  <p className="work-tags">Product design · Enterprise Retail System</p>
-                  <p className="work-desc">
-                    High-efficiency cashier POS interface and multi-supplier inventory management platform
-                    handling 100+ SKUs and continuous daily financial transactions.
-                  </p>
-                  <a className="btn-secondary" href="#contact">
-                    View work <ArrowRight size={15} />
-                  </a>
-                </div>
-                <div className="work-shots">
-                  <div className="shot">
-                    <div className="ph ph-4">
-                      <span>01 / Cashier POS</span>
-                      <strong>Keyboard-Driven Checkout</strong>
+              {/* Project 04: Naza Cell POS */}
+              <div className="reveal" id="project-04">
+                <Card3D maxTilt={7}>
+                  <article className="work-row">
+                    <div className="work-info">
+                      <h3>Naza Cell POS</h3>
+                      <p className="work-tags">Product design · Enterprise Retail System</p>
+                      <p className="work-desc">
+                        High-efficiency cashier POS interface and multi-supplier inventory management platform
+                        handling 100+ SKUs and continuous daily financial transactions.
+                      </p>
+                      <a className="btn-secondary" href="#contact">
+                        View system <ArrowRight size={15} />
+                      </a>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-a">
-                      <span>02 / Inventory Matrix</span>
-                      <strong>100+ SKU Tracking</strong>
+                    <div className="work-shots">
+                      <ShotCard3D>
+                        <div className="ph ph-4">
+                          <span>01 / Cashier POS</span>
+                          <strong>Keyboard-Driven Checkout</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-a">
+                          <span>02 / Inventory Matrix</span>
+                          <strong>100+ SKU Tracking</strong>
+                        </div>
+                      </ShotCard3D>
+                      <ShotCard3D>
+                        <div className="ph ph-alt-b">
+                          <span>03 / Operations</span>
+                          <strong>50-80 Daily Transactions</strong>
+                        </div>
+                      </ShotCard3D>
                     </div>
-                  </div>
-                  <div className="shot">
-                    <div className="ph ph-alt-b">
-                      <span>03 / Operations</span>
-                      <strong>50-80 Daily Transactions</strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
+                  </article>
+                </Card3D>
+              </div>
             </div>
           </div>
         </section>
