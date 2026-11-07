@@ -152,6 +152,186 @@ export default function App() {
   const arcTrackRef = useRef<HTMLDivElement>(null);
   const stackRef = useRef<HTMLDivElement>(null);
   const startProjectRef = useRef<HTMLAnchorElement>(null);
+  const linksRef = useRef<SVGSVGElement>(null);
+  const selRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+
+  // -------------------------------------------------------------
+  // Hero signature: Figma-style prototype links from the title to
+  // each tile, a selection frame, and a "Naza" collaborator cursor
+  // that hops between tiles once the intro has finished.
+  // -------------------------------------------------------------
+  useEffect(() => {
+    const hero = heroRef.current;
+    const svg = linksRef.current;
+    const sel = selRef.current;
+    const cur = cursorRef.current;
+    if (!hero || !svg || !sel || !cur) return;
+
+    const root = document.documentElement;
+    const desk = window.matchMedia("(min-width: 760px)");
+    const calm = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+    const title = hero.querySelector<HTMLElement>(".hero-title");
+    const tiles = Array.from(hero.querySelectorAll<HTMLElement>(".tile"));
+    const paths = Array.from(svg.querySelectorAll<SVGPathElement>("path.link"));
+    const sizeLabel = sel.querySelector<HTMLElement>(".sel-size");
+    if (!title) return;
+
+    let ready = false;
+    let alive = true;
+    let raf = 0;
+    let hopTimer = 0;
+    let selectTimer = 0;
+    let selected: HTMLElement | null = null;
+    let hovered: HTMLElement | null = null;
+    let last = -1;
+
+    const textBox = () => {
+      const range = document.createRange();
+      range.selectNodeContents(title);
+      return range.getBoundingClientRect();
+    };
+
+    const draw = () => {
+      if (!ready || !desk.matches) return;
+      const hr = hero.getBoundingClientRect();
+      const t = textBox();
+
+      // fade the whole layer out as the hero scrolls away
+      const p = Math.min(Math.max(-hr.top / (hero.offsetHeight * 0.3), 0), 1);
+      hero.style.setProperty("--links-fade", (1 - p).toFixed(3));
+
+      tiles.forEach((tile, i) => {
+        const r = tile.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const gapX = cx < t.left ? t.left - r.right : cx > t.right ? r.left - t.right : -1;
+        const gapY = cy < t.top ? t.top - r.bottom : cy > t.bottom ? r.top - t.bottom : -1;
+        const inY = cy >= t.top && cy <= t.bottom;
+        const inX = cx >= t.left && cx <= t.right;
+        const horizontal = inY || (!inX && gapX >= gapY);
+        const path = paths[i];
+        // a tile sitting on the text has no room for a link: hide it
+        if (path) path.style.display = (horizontal ? gapX : gapY) < 36 ? "none" : "";
+        let d: string;
+        if (horizontal) {
+          const left = cx < t.left;
+          const sx = (left ? t.left - 12 : t.right + 12) - hr.left;
+          const sy = Math.min(Math.max(cy, t.top + 16), t.bottom - 16) - hr.top;
+          const ex = (left ? r.right + 10 : r.left - 10) - hr.left;
+          const ey = cy - hr.top;
+          const mx = (sx + ex) / 2;
+          d = `M${sx.toFixed(1)} ${sy.toFixed(1)} C${mx.toFixed(1)} ${sy.toFixed(1)} ${mx.toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+        } else {
+          const above = cy < t.top;
+          const sx = Math.min(Math.max(cx, t.left + 16), t.right - 16) - hr.left;
+          const sy = (above ? t.top - 10 : t.bottom + 10) - hr.top;
+          const ex = cx - hr.left;
+          const ey = (above ? r.bottom + 10 : r.top - 10) - hr.top;
+          const my = (sy + ey) / 2;
+          d = `M${sx.toFixed(1)} ${sy.toFixed(1)} C${sx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+        }
+        if (path) {
+          path.setAttribute("d", d);
+          path.classList.toggle("active", tile === (hovered || selected));
+        }
+      });
+
+      const target = hovered || selected;
+      if (target) {
+        const r = target.getBoundingClientRect();
+        sel.style.transform = `translate(${(r.left - hr.left).toFixed(1)}px, ${(r.top - hr.top).toFixed(1)}px)`;
+        sel.style.width = `${r.width.toFixed(1)}px`;
+        sel.style.height = `${r.height.toFixed(1)}px`;
+        if (sizeLabel) sizeLabel.textContent = `${Math.round(r.width)} × ${Math.round(r.height)}`;
+        sel.classList.add("on");
+      } else {
+        sel.classList.remove("on");
+      }
+    };
+
+    // keep lines glued to tiles while they parallax or fly away
+    let visible = true;
+    const loop = () => {
+      draw();
+      raf = visible && alive ? requestAnimationFrame(loop) : 0;
+    };
+    const io = new IntersectionObserver(([en]) => {
+      visible = en.isIntersecting;
+      if (visible && !raf && ready) raf = requestAnimationFrame(loop);
+    });
+    io.observe(hero);
+
+    const hop = () => {
+      if (!alive) return;
+      const heroGone = window.scrollY > hero.offsetHeight * 0.25;
+      if (!desk.matches || heroGone || hovered) {
+        cur.classList.toggle("on", !heroGone && desk.matches);
+        hopTimer = window.setTimeout(hop, 1200);
+        return;
+      }
+      let i = Math.floor(Math.random() * tiles.length);
+      if (i === last) i = (i + 1) % tiles.length;
+      last = i;
+      const hr = hero.getBoundingClientRect();
+      const r = tiles[i].getBoundingClientRect();
+      const x = r.left - hr.left + r.width * 0.62;
+      const y = r.top - hr.top + r.height * 0.58;
+      cur.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      cur.classList.add("on");
+      selected = null;
+      selectTimer = window.setTimeout(() => {
+        selected = tiles[i];
+        cur.classList.add("click");
+        window.setTimeout(() => cur.classList.remove("click"), 220);
+      }, 950);
+      hopTimer = window.setTimeout(hop, 3000);
+    };
+
+    const start = () => {
+      if (ready || !alive) return;
+      ready = true;
+      draw();
+      // next frame so the draw-on transition runs from an empty line
+      requestAnimationFrame(() => svg.classList.add("on"));
+      if (!raf) raf = requestAnimationFrame(loop);
+      if (!calm) hopTimer = window.setTimeout(hop, 1100);
+    };
+
+    const mo = new MutationObserver(() => {
+      if (!root.classList.contains("intro")) start();
+    });
+    if (root.classList.contains("intro")) {
+      mo.observe(root, { attributes: true, attributeFilter: ["class"] });
+    } else {
+      start();
+    }
+
+    const enter = (e: Event) => {
+      hovered = e.currentTarget as HTMLElement;
+    };
+    const leave = () => {
+      hovered = null;
+    };
+    tiles.forEach((t) => {
+      t.addEventListener("pointerenter", enter);
+      t.addEventListener("pointerleave", leave);
+    });
+
+    return () => {
+      alive = false;
+      mo.disconnect();
+      io.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      clearTimeout(hopTimer);
+      clearTimeout(selectTimer);
+      tiles.forEach((t) => {
+        t.removeEventListener("pointerenter", enter);
+        t.removeEventListener("pointerleave", leave);
+      });
+      svg.classList.remove("on");
+    };
+  }, []);
 
   useEffect(() => {
     // -------------------------------------------------------------
@@ -183,6 +363,8 @@ export default function App() {
     const hero = heroRef.current;
     const root = document.documentElement;
     let introDone = !root.classList.contains("intro");
+    let disposed = false;
+    let introAnims: Animation[] = [];
     const rot = [-9, 6, -4, 8, -6, 3];
 
     let flyTiles: HTMLElement[] = [];
@@ -255,7 +437,7 @@ export default function App() {
     };
 
     const finishIntro = (anims: Animation[]) => {
-      if (introDone) return;
+      if (introDone || disposed) return;
       introDone = true;
       root.classList.remove("intro");
       anims.forEach((a) => a.cancel());
@@ -268,6 +450,9 @@ export default function App() {
       eyebrows = Array.from(hero.querySelectorAll<HTMLElement>(".eyebrow"));
 
       if (!introDone) {
+        // React StrictMode runs this effect twice in dev: clear any leftover
+        // intro animation so tiles are measured at their real resting spot.
+        hero.getAnimations({ subtree: true }).forEach((a) => a.cancel());
         const title = hero.querySelector<HTMLElement>(".hero-title");
         if (title) {
           const t = title.getBoundingClientRect();
@@ -288,6 +473,7 @@ export default function App() {
           const FAN = 45;
           const spreadAt = (flyTiles.length - 1) * DEAL + APPEAR + HOLD;
           const anims: Animation[] = [];
+          introAnims = anims;
 
           flyTiles.forEach((el, i) => {
             const r = el.getBoundingClientRect();
@@ -546,6 +732,8 @@ export default function App() {
     }
 
     return () => {
+      disposed = true;
+      introAnims.forEach((a) => a.cancel());
       window.removeEventListener("scroll", onScrollNav);
       if (arcCancel) cancelAnimationFrame(arcCancel);
     };
@@ -640,6 +828,58 @@ export default function App() {
             <i />
             <i />
             <i />
+          </div>
+
+          {/* Figma-style prototype links (drawn by JS after the intro) */}
+          <svg className="hero-links" ref={linksRef} aria-hidden="true">
+            <defs>
+              <marker id="lk-dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7">
+                <circle cx="5" cy="5" r="3.5" fill="#fff" stroke="currentColor" strokeWidth="2" />
+              </marker>
+              <marker
+                id="lk-arrow"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto-start-reverse"
+              >
+                <path
+                  d="M2 1.5 L8 5 L2 8.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </marker>
+            </defs>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <path
+                key={i}
+                className="link"
+                pathLength={1}
+                markerStart="url(#lk-dot)"
+                markerEnd="url(#lk-arrow)"
+                style={{ "--i": i } as React.CSSProperties}
+              />
+            ))}
+          </svg>
+
+          <div className="sel-box" ref={selRef} aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+            <span className="sel-size" />
+          </div>
+
+          <div className="collab-cursor" ref={cursorRef} aria-hidden="true">
+            <svg viewBox="0 0 16 20" width="16" height="20">
+              <path d="M1.5 1.5 L1.5 16 L5.4 12.3 L8.2 18.6 L10.9 17.4 L8.2 11.3 L13.6 11.3 Z" />
+            </svg>
+            <span>Naza</span>
           </div>
 
           <div className="tiles">
