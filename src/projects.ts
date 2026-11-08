@@ -49,12 +49,12 @@ export const projectDetails: ProjectDetail[] = [
     folder: "hub",
     name: "STEAM Team Hub",
     tags: "Brand & web design · Team Research Portal",
-    lead: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the SteamCraft platform to IoT and biotech prototypes.",
+    lead: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the live SteamCraft platform to IoT and biotech projects still in development.",
     overview: [
       "steamcraft.online is the main domain of the STEAM research team. Under the motto Learn, Create, Impact, it introduces the team, its visual identity and every collaborative research initiative in one place.",
-      "The hub connects the flagship SteamCraft platform with the team's other projects, including an IoT marine buoy for coral-reef monitoring and an organic, biodegradable mycelium battery, and links each member to their own portfolio.",
+      "The hub connects the flagship SteamCraft platform, already live, with the team's next projects that are currently in development: an IoT marine buoy for coral-reef monitoring and an organic, biodegradable mycelium battery. It also links each member to their own portfolio.",
     ],
-    highlights: ["Team visual identity", "3 member profile cards", "Team projects gateway", "Research pillars", "Links to every subdomain"],
+    highlights: ["Team visual identity", "3 member profile cards", "SteamCraft platform: live", "IoT Marine Buoy: in development", "Mycobattery: in development"],
     meta: [
       { label: "Role", value: "Project lead & lead system architect" },
       { label: "Team", value: "3 members" },
@@ -63,7 +63,7 @@ export const projectDetails: ProjectDetail[] = [
     link: { href: "https://steamcraft.online", label: "Visit the hub", display: "steamcraft.online" },
     features: [
       { title: "Research Team Members", text: "ID-card style profiles for the three team members, each with their role, division, skills and a link to their personal portfolio." },
-      { title: "Team Projects Gateway", text: "Filterable project cards for software, marine IoT hardware and biotech research, showing each project's status, key specs and tech stack." },
+      { title: "Team Projects Gateway", text: "Filterable project cards with each project's status: the SteamCraft platform is live, while the IoT Marine Buoy and the EcoBiosynthesis Mycobattery are still in development." },
       { title: "Research Pillars & Ecosystem", text: "Four research pillars, from scientific methodology to FAIR data and smart instrumentation, plus direct entry points to the specialist apps." },
     ],
   },

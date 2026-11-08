@@ -27,7 +27,7 @@ const steamcraftProjects: {
     domain: "steamcraft.online",
     name: "STEAM Team Hub",
     tags: "Brand & web design · Team Research Portal",
-    desc: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the SteamCraft platform to IoT and biotech prototypes.",
+    desc: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the live SteamCraft platform to IoT and biotech projects in development.",
     cta: "Visit the hub",
     shots: ["Research Team Members", "Team Projects Gateway", "Research Pillars & Ecosystem"],
   },
