@@ -10,6 +10,8 @@ export type ProjectDetail = {
   slug: string;
   /** folder in public/work/ holding cover.jpg + 1..3.jpg; null = placeholders */
   folder: string | null;
+  /** mobile app: show phone mockups (see MobileMock.tsx) instead of browser frames */
+  mobile?: "this-me";
   name: string;
   tags: string;
   lead: string;
@@ -24,6 +26,7 @@ export const projectDetails: ProjectDetail[] = [
   {
     slug: "this-me",
     folder: null,
+    mobile: "this-me",
     name: "This Me",
     tags: "Product design · Inclusive App Design",
     lead: "An interactive Indonesian Sign Language (BISINDO) learning app featuring 30+ Figma interfaces, gamified camera recognition, and inclusive UX for the Deaf community.",
@@ -39,9 +42,9 @@ export const projectDetails: ProjectDetail[] = [
     ],
     link: { href: "https://github.com/nazaa-arch/webporto", label: "View work", display: "github.com/nazaa-arch" },
     features: [
-      { title: "Onboarding Flow", text: "A gesture-based onboarding that gamifies the first lessons so new learners build confidence quickly." },
-      { title: "Design System", text: "Figma auto-layout components and tokens keep more than 30 screens consistent and easy to extend." },
-      { title: "Usability Study", text: "Validated with the System Usability Scale, reaching a score of 92.5." },
+      { title: "Animated Loading Screen", text: "Two signing hands come together to form the This Me logo, setting a warm, friendly tone before the first lesson begins." },
+      { title: "Learning Home", text: "Daily progress at the top, four learning tracks for the alphabet, numbers, phrases and conversation, workplace signs below and the camera always one tap away." },
+      { title: "Alphabet Lesson", text: "A video demonstration for every letter, a continue-learning card and an alphabet grid that ticks off each sign already mastered." },
     ],
   },
   {

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { projectDetails, type ProjectDetail as Project } from "./projects";
+import { PromoStage, PromoTile, thisMePromos, thisMeScreens } from "./MobileMock";
 
 const BASE = import.meta.env.BASE_URL;
 const img = (folder: string, file: string) => `${BASE}work/${folder}/${file}`;
@@ -126,7 +127,15 @@ export default function ProjectDetail({
 
         {/* ---------- Cover ---------- */}
         <section className="container wide pd-cover">
-          <Frame project={project} file="cover.jpg" label={project.features[0].title} index={0} eager />
+          {project.mobile ? (
+            <PromoStage
+              screens={[thisMeScreens.home, thisMeScreens.loading, thisMeScreens.alphabet]}
+              title="Sign language, made friendly"
+              sub="A BISINDO learning app with video lessons, daily progress and camera practice."
+            />
+          ) : (
+            <Frame project={project} file="cover.jpg" label={project.features[0].title} index={0} eager />
+          )}
         </section>
 
         {/* ---------- Overview ---------- */}
@@ -151,7 +160,11 @@ export default function ProjectDetail({
           </h2>
           {project.features.map((f, i) => (
             <article className={`pd-feature ${i % 2 ? "flip" : ""}`} key={f.title}>
-              <Frame project={project} file={`${i + 1}.jpg`} label={f.title} index={i} />
+              {project.mobile ? (
+                <PromoTile promo={thisMePromos[i]} size="large" />
+              ) : (
+                <Frame project={project} file={`${i + 1}.jpg`} label={f.title} index={i} />
+              )}
               <div className="pd-feature-text">
                 <span className="pd-num">0{i + 1}</span>
                 <h3>{f.title}</h3>
@@ -173,7 +186,9 @@ export default function ProjectDetail({
               </span>
             </div>
             <div className="pd-next-thumb" aria-hidden="true">
-              {next.folder ? (
+              {next.mobile ? (
+                <PromoTile promo={thisMePromos[0]} />
+              ) : next.folder ? (
                 <img src={img(next.folder, "cover.jpg")} alt="" loading="lazy" decoding="async" />
               ) : (
                 <div className="pd-ph pd-ph-1">

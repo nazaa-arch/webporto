@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, Copy, Menu, X } from "lucide-react";
 import ProjectDetail, { projectHref } from "./ProjectDetail";
 import { findProject } from "./projects";
+import { PromoTile, thisMePromos } from "./MobileMock";
 
 /* -------------------------------------------------------------------------- */
 /*                      STEAMCRAFT + ECOSYSTEM APPS (REAL SCREENSHOTS)                    */
@@ -1026,10 +1027,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           <div className="tiles">
             {/* Tile 1 */}
             <div className="tile t1">
-              <div className="ph ph-1">
-                <span>01 / This Me UI</span>
-                <strong>BISINDO Mobile App</strong>
-              </div>
+              <PromoTile promo={thisMePromos[0]} />
             </div>
 
             {/* Tile 2 */}
@@ -1149,24 +1147,11 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                       </a>
                     </div>
                     <div className="work-shots">
-                      <ShotCard3D>
-                        <div className="ph ph-1">
-                          <span>01 / Onboarding Flow</span>
-                          <strong>Gesture Gamification</strong>
-                        </div>
-                      </ShotCard3D>
-                      <ShotCard3D>
-                        <div className="ph ph-alt-a">
-                          <span>02 / Design System</span>
-                          <strong>Figma Auto-Layout &amp; Tokens</strong>
-                        </div>
-                      </ShotCard3D>
-                      <ShotCard3D>
-                        <div className="ph ph-alt-b">
-                          <span>03 / Usability Study</span>
-                          <strong>SUS Score 92.5 (Silver Medal)</strong>
-                        </div>
-                      </ShotCard3D>
+                      {thisMePromos.map((promo) => (
+                        <ShotCard3D key={promo.title} className="shot-promo">
+                          <PromoTile promo={promo} />
+                        </ShotCard3D>
+                      ))}
                     </div>
                   </article>
                 </Card3D>
