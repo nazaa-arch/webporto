@@ -120,7 +120,20 @@ const steamcraftProjects: {
 ];
 
 /* -------------------------------------------------------------------------- */
-/*              3D INTERACTIVE CARD CONTAINER (ZYXKOO.DEV STYLE)              */
+/*                        MORE EXPLORATIONS (SIDE PROJECTS)                   */
+/* -------------------------------------------------------------------------- */
+
+const explorations = [
+  { label: "This Me UI", title: "Gesture Gamification App", meta: "30+ Figma interfaces", tone: "blue" },
+  { label: "SteamSim Lab", title: "Virtual Science Simulation", meta: "sim.steamcraft.online", tone: "teal" },
+  { label: "MakerCraft 3D", title: "Parametric 3D Art Studio", meta: "maker.steamcraft.online", tone: "pink" },
+  { label: "A-KERE Finance", title: "Frictionless Expense Logging", meta: "Mobile prototyping", tone: "amber" },
+  { label: "Cyberbullying NLP", title: "93% Accuracy Model", meta: "3,000+ text datasets", tone: "indigo" },
+  { label: "Spatial Dengue GWR", title: "East Java Geodata Science", meta: "Geographic regression", tone: "green" },
+];
+
+/* -------------------------------------------------------------------------- */
+/*                      3D INTERACTIVE CARD CONTAINER                         */
 /* -------------------------------------------------------------------------- */
 
 function Card3D({
@@ -286,8 +299,6 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
 
   const heroRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLElement>(null);
-  const arcTrackRef = useRef<HTMLDivElement>(null);
-  const stackRef = useRef<HTMLDivElement>(null);
   const startProjectRef = useRef<HTMLAnchorElement>(null);
   const linksRef = useRef<SVGSVGElement>(null);
   const selRef = useRef<HTMLDivElement>(null);
@@ -727,158 +738,11 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
       reveals.forEach((el) => el.classList.add("in"));
     }
 
-    // -------------------------------------------------------------
-    // 5. Curved Arc Gallery (Parabolic formula & scroll boost)
-    // -------------------------------------------------------------
-    const arcTrack = arcTrackRef.current;
-    let arcCancel: number | null = null;
-    if (arcTrack) {
-      const arcView = arcTrack.parentElement as HTMLElement;
-      let arcCards: HTMLElement[] = [];
-      let arcOffset = 0;
-      let arcLast = 0;
-      let arcOn = false;
-      let arcBoost = 0;
-      let arcStep = 0;
-      let arcTotal = 0;
-      let arcW = 0;
-      let arcCurve = 0;
-      let arcLastY = window.scrollY;
-      const arcCalm = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
-      const ARC_GAP = 24;
-      const ARC_SPEED = 40;
-
-      const arcSetup = () => {
-        arcTrack.querySelectorAll(".arc-clone").forEach((c) => c.remove());
-        const originals = Array.from(arcTrack.children) as HTMLElement[];
-        if (!originals.length) return;
-        arcW = originals[0].offsetWidth || 300;
-        arcStep = arcW + ARC_GAP;
-        const need = arcView.clientWidth + arcStep * 2;
-        let total = originals.length * arcStep;
-        while (total < need) {
-          originals.forEach((c) => {
-            const k = c.cloneNode(true) as HTMLElement;
-            k.classList.add("arc-clone");
-            arcTrack.appendChild(k);
-          });
-          total += originals.length * arcStep;
-        }
-        arcCards = Array.from(arcTrack.children) as HTMLElement[];
-        arcTotal = arcCards.length * arcStep;
-        arcCurve = arcW * 0.42;
-      };
-
-      const arcRender = () => {
-        const half = arcView.clientWidth / 2;
-        const radius = Math.max(half, arcW * 1.6);
-        for (let i = 0; i < arcCards.length; i++) {
-          const x = (((i * arcStep + arcOffset) % arcTotal) + arcTotal) % arcTotal - arcStep;
-          const u = (x + arcW / 2 - half) / radius;
-          arcCards[i].style.transform = `translate3d(${x.toFixed(1)}px, ${(arcCurve * u * u).toFixed(
-            1
-          )}px, 0) rotate(${(u * 9).toFixed(2)}deg)`;
-        }
-      };
-
-      const arcTick = (t: number) => {
-        if (!arcOn || disposed) {
-          arcLast = 0;
-          return;
-        }
-        const dt = arcLast ? Math.min(t - arcLast, 64) / 1000 : 0;
-        arcLast = t;
-        arcOffset -= (ARC_SPEED + arcBoost) * dt;
-        arcBoost *= 0.94;
-        arcRender();
-        arcCancel = requestAnimationFrame(arcTick);
-      };
-
-      arcSetup();
-      arcRender();
-
-      window.addEventListener("resize", () => {
-        arcSetup();
-        arcRender();
-      }, { signal });
-
-      if (!arcCalm) {
-        window.addEventListener(
-          "scroll",
-          () => {
-            const y = window.scrollY;
-            arcBoost = Math.min(500, arcBoost + Math.abs(y - arcLastY) * 3);
-            arcLastY = y;
-          },
-          { passive: true, signal }
-        );
-
-        if ("IntersectionObserver" in window) {
-          const arcIo = new IntersectionObserver((entries) => {
-            const vis = entries[0].isIntersecting;
-            if (vis && !arcOn) {
-              arcOn = true;
-              requestAnimationFrame(arcTick);
-            } else if (!vis) {
-              arcOn = false;
-            }
-          });
-          arcIo.observe(arcView);
-          signal.addEventListener("abort", () => arcIo.disconnect());
-        } else {
-          arcOn = true;
-          requestAnimationFrame(arcTick);
-        }
-      }
-    }
-
-    // -------------------------------------------------------------
-    // 6. Stacking Animation: About -> Services
-    // -------------------------------------------------------------
-    const stack = stackRef.current;
-    if (stack) {
-      const about = stack.querySelector<HTMLElement>(".about");
-      const services = stack.querySelector<HTMLElement>(".services");
-      let stackTick = false;
-
-      const setStick = () => {
-        if (!about) return;
-        const t = Math.min(0, window.innerHeight - about.offsetHeight);
-        about.style.setProperty("--stick", `${t}px`);
-        about.style.setProperty("--origin", `${window.innerHeight / 2 - t}px`);
-      };
-
-      const updateStack = () => {
-        stackTick = false;
-        if (!about || !services) return;
-        const p = 1 - services.getBoundingClientRect().top / window.innerHeight;
-        about.style.setProperty("--p", Math.max(0, Math.min(1, p)).toFixed(3));
-      };
-
-      setStick();
-      updateStack();
-      window.addEventListener("resize", () => {
-        setStick();
-        updateStack();
-      }, { signal });
-      window.addEventListener(
-        "scroll",
-        () => {
-          if (!stackTick) {
-            stackTick = true;
-            requestAnimationFrame(updateStack);
-          }
-        },
-        { passive: true, signal }
-      );
-    }
-
     return () => {
       disposed = true;
       ac.abort();
       introAnims.forEach((a) => a.cancel());
       window.removeEventListener("scroll", onScrollNav);
-      if (arcCancel) cancelAnimationFrame(arcCancel);
     };
   }, []);
 
@@ -1073,24 +937,24 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           </div>
 
           <h1 className="hero-title">
-            <span>The design and UI/UX</span>
-            <span>direction portfolio</span>
-            <span>of Naza Firmansyah</span>
+            <span>Designing products</span>
+            <span>that make data</span>
+            <span>feel human.</span>
           </h1>
 
           <p className="eyebrow left">
-            Design
+            Naza Firmansyah
             <br />
-            UI/UX Direction
+            UI/UX Designer
             <br />
-            Portfolio
+            &amp; Data Science
           </p>
           <p className="eyebrow right">
-            Selected
+            Surabaya
             <br />
-            Work
+            Indonesia
             <br />
-            2026
+            2024&ndash;2026
           </p>
         </section>
 
@@ -1099,7 +963,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           <div className="container wide">
             <div className="display-head reveal">
               <h2 className="display-title">
-                Selected works<sup className="display-count">(11)</sup>
+                Selected works <span className="count-pill">11 projects</span>
               </h2>
               <div className="display-sub-row">
                 <p className="display-sub">2024 – 2026</p>
@@ -1296,71 +1160,46 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           </div>
         </section>
 
-        {/* -------------------- CURVED ARC GALLERY -------------------- */}
-        <section className="arc" aria-label="More explorations">
-          <div className="container wide arc-head reveal">
-            <h3>More explorations</h3>
-            <p>Concepts, side projects, and data science experiments.</p>
-          </div>
-
-          <div className="arc-viewport" aria-hidden="true">
-            <div className="arc-track" id="arcTrack" ref={arcTrackRef}>
-              <div className="arc-card">
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>THIS ME UI</span>
-                <strong>Gesture Gamification App</strong>
-                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>30+ Figma Interfaces</span>
+        {/* -------------------- MORE EXPLORATIONS -------------------- */}
+        <section className="explore" aria-labelledby="explore-title">
+          <div className="container wide">
+            <div className="explore-head reveal">
+              <div>
+                <p className="explore-kicker">Side projects &amp; research</p>
+                <h2 className="explore-title" id="explore-title">More explorations</h2>
               </div>
-              <div className="arc-card">
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>STEAMSIM LAB</span>
-                <strong>Virtual Science Simulation</strong>
-                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>sim.steamcraft.online</span>
-              </div>
-              <div className="arc-card">
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>MAKERCRAFT 3D</span>
-                <strong>Parametric 3D Art Studio</strong>
-                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>maker.steamcraft.online</span>
-              </div>
-              <div className="arc-card">
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>A-KERE FINANCE</span>
-                <strong>Frictionless Expense Logging</strong>
-                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>Mobile Prototyping</span>
-              </div>
-              <div className="arc-card">
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>CYBERBULLYING NLP</span>
-                <strong>93% Accuracy Model</strong>
-                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>3,000+ Text Datasets</span>
-              </div>
-              <div className="arc-card">
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--primary)" }}>SPATIAL DENGUE GWR</span>
-                <strong>East Java Geodata Science</strong>
-                <span style={{ fontSize: "12px", color: "var(--neutral-500)" }}>Geographic Regression</span>
-              </div>
+              <p>Concepts, side projects, and data science experiments.</p>
             </div>
-          </div>
 
-          <div className="arc-cta reveal">
-            <div className="arc-cta-text">
+            <ul className="explore-grid">
+              {explorations.map((x, i) => (
+                <li className={`explore-card reveal tone-${x.tone}`} key={x.label} style={{ "--rd": `${(i % 3) * 70}ms` } as React.CSSProperties}>
+                  <span className="explore-label">{x.label}</span>
+                  <strong>{x.title}</strong>
+                  <span className="explore-meta">{x.meta}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="explore-cta reveal">
               <div>
                 <strong>Like what you see?</strong>
                 <span>Open for new UI/UX projects &middot; Let&rsquo;s build something together</span>
               </div>
-            </div>
-            <div className="arc-cta-btns">
-              <a className="btn-primary" href="#contact">
-                Contact me <ArrowRight size={15} />
-              </a>
-              <a
-                className="btn-secondary"
-                href="mailto:firmannaza307@gmail.com?subject=CV%20Request"
-              >
-                Request CV <ArrowUpRight size={15} />
-              </a>
+              <div className="explore-btns">
+                <a className="btn-primary" href="#contact">
+                  Contact me <ArrowRight size={15} />
+                </a>
+                <a className="btn-secondary" href="mailto:firmannaza307@gmail.com?subject=CV%20Request">
+                  Request CV <ArrowUpRight size={15} />
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* -------------------- STACKING (ABOUT + SERVICES) -------------------- */}
-        <div className="stack" ref={stackRef}>
+        {/* -------------------- ABOUT + SERVICES -------------------- */}
+        <div className="about-services">
           <section className="about" id="about">
             <div className="meet">
               <figure className="meet-photo">
@@ -1374,8 +1213,8 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                   decoding="async"
                 />
                 <p className="meet-tag" aria-hidden="true">
-                  <span>[Naza</span>
-                  <span>Firmansyah]</span>
+                  <span>Hi, I&rsquo;m</span>
+                  <span>Naza.</span>
                 </p>
                 <div className="meet-roles">
                   <p>
@@ -1441,13 +1280,13 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
             <div className="container wide">
               <div className="display-head reveal">
                 <h2 className="display-title">
-                  Services<sup className="display-count">(06)</sup>
+                  Services <span className="count-pill">6 services</span>
                 </h2>
               </div>
 
               <div className="service-list">
                 <a className="service-row reveal" href="#contact">
-                  <span className="service-num">(01)</span>
+                  <span className="service-num">01</span>
                   <h3 className="service-name">Product strategy</h3>
                   <p className="service-desc">
                     Turning business goals and user behaviors into clear product roadmaps through user interviews, empathy mapping, and information architecture.
@@ -1458,7 +1297,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                 </a>
 
                 <a className="service-row reveal" href="#contact" style={{ "--rd": "80ms" } as React.CSSProperties}>
-                  <span className="service-num">(02)</span>
+                  <span className="service-num">02</span>
                   <h3 className="service-name">UI/UX &amp; product design</h3>
                   <p className="service-desc">
                     Designing seamless digital experiences through user journeys, wireframes, high-fidelity interfaces, and interactive prototypes.
@@ -1469,7 +1308,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                 </a>
 
                 <a className="service-row reveal" href="#contact" style={{ "--rd": "160ms" } as React.CSSProperties}>
-                  <span className="service-num">(03)</span>
+                  <span className="service-num">03</span>
                   <h3 className="service-name">Web &amp; dashboard design</h3>
                   <p className="service-desc">
                     Creating modern, responsive websites, retail POS dashboards, and data visualization tools balancing visual clarity with dense information.
@@ -1480,7 +1319,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                 </a>
 
                 <a className="service-row reveal" href="#contact">
-                  <span className="service-num">(04)</span>
+                  <span className="service-num">04</span>
                   <h3 className="service-name">App design</h3>
                   <p className="service-desc">
                     Crafting user-friendly mobile applications with thoughtful micro-interactions, WCAG accessibility, and frictionless checkout flows.
@@ -1491,7 +1330,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                 </a>
 
                 <a className="service-row reveal" href="#contact" style={{ "--rd": "80ms" } as React.CSSProperties}>
-                  <span className="service-num">(05)</span>
+                  <span className="service-num">05</span>
                   <h3 className="service-name">Design systems</h3>
                   <p className="service-desc">
                     Building scalable Figma token architectures, reusable component variants, and consistent visual guidelines that accelerate development.
@@ -1502,7 +1341,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                 </a>
 
                 <a className="service-row reveal" href="#contact" style={{ "--rd": "160ms" } as React.CSSProperties}>
-                  <span className="service-num">(06)</span>
+                  <span className="service-num">06</span>
                   <h3 className="service-name">Data &amp; usability evaluation</h3>
                   <p className="service-desc">
                     Validating digital products through System Usability Scale (SUS) benchmarking, qualitative user feedback, and data-informed iterations.
