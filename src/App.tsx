@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight, Check, Copy, Menu, X } from "lucide-react";
 import ProjectDetail, { projectHref } from "./ProjectDetail";
 import { findProject } from "./projects";
 import { PromoTile, thisMePromos } from "./MobileMock";
+import { WebPromoTile, webPromos } from "./WebPromo";
 
 /* -------------------------------------------------------------------------- */
 /*                      STEAMCRAFT + ECOSYSTEM APPS (REAL SCREENSHOTS)                    */
@@ -1187,7 +1188,13 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                         </a>
                       </div>
                       <div className="work-shots">
-                        {proj.shots.map((label, i) => (
+                        {webPromos[proj.slug]
+                          ? [0, 1, 2].map((i) => (
+                              <ShotCard3D key={i} className="shot-promo">
+                                <WebPromoTile set={webPromos[proj.slug]} index={i} />
+                              </ShotCard3D>
+                            ))
+                          : proj.shots.map((label, i) => (
                           <ShotCard3D key={label} className="shot-media">
                             <img
                               className="shot-img"

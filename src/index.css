@@ -2127,3 +2127,129 @@ a.tile:hover {
 /* next-project thumbnail is 16:10 */
 .pd-next-thumb .promo { aspect-ratio: auto; height: 100%; }
 .pd-next-thumb .promo-sub, .pd-next-thumb .promo-chip { display: none; }
+
+/* ==========================================================================
+   Web-app promo tiles (WebPromo.tsx): browser window on the app's brand
+   colour. Scoped to .promo-web / .promo-web-stage, so This Me is unaffected.
+   ========================================================================== */
+.promo.promo-web { background: var(--promo-bg); }
+.promo-web .promo-copy { width: 76cqw; gap: 1.8cqw; }
+.promo-web .promo-title { font-size: 6cqw; }
+.promo-web .promo-sub { font-size: 3cqw; }
+.promo-web .promo-chip { left: 6cqw; bottom: 6cqw; z-index: 2; }
+
+.bmock {
+  overflow: hidden;
+  border-radius: 2.4cqw;
+  background: #fff;
+  box-shadow: 0 30px 60px -20px rgba(5, 15, 35, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+.bmock-bar {
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+  height: 5.2cqw;
+  padding: 0 2.4cqw;
+  background: #eef1f6;
+  border-bottom: 1px solid #dfe4ec;
+}
+.bmock-bar i { width: 1.5cqw; height: 1.5cqw; border-radius: 50%; }
+.bmock-bar i:nth-child(1) { background: #ff6b5f; }
+.bmock-bar i:nth-child(2) { background: #ffc441; }
+.bmock-bar i:nth-child(3) { background: #3ccf6a; }
+.bmock-bar span {
+  margin-left: 3cqw;
+  padding: 0.6cqw 2.4cqw;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 2.2cqw;
+  line-height: 1.2;
+  color: #64748b;
+  white-space: nowrap;
+}
+.bmock-screen { aspect-ratio: 4 / 3; overflow: hidden; }
+.bmock-screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+
+.promo-window {
+  position: absolute;
+  left: 14cqw;
+  top: 33cqw;
+  width: 86cqw;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.promo-web:hover .promo-window,
+.shot:hover .promo-web .promo-window { transform: translateY(-2.5cqw); }
+
+/* case-study cover */
+.promo-web-stage {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--r-lg);
+  background: var(--promo-bg);
+  box-shadow: var(--shadow-3d);
+  color: #fff;
+  --ink: #fff;
+}
+.promo-web-stage::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 60cqw;
+  height: 60cqw;
+  right: -10cqw;
+  top: -24cqw;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+}
+.promo-web-stage-copy {
+  position: absolute;
+  left: 5.5cqw;
+  top: 50%;
+  width: 32cqw;
+  transform: translateY(-50%);
+  display: grid;
+  gap: 1.6cqw;
+}
+.promo-web-stage-copy .promo-brand { font-size: 2.4cqw; }
+.promo-web-stage-copy strong {
+  font-size: 4.2cqw;
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+.promo-web-stage-copy > span:last-child {
+  font-size: 1.7cqw;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+}
+.promo-web-stage-window {
+  position: absolute;
+  left: 41cqw;
+  top: 10cqw;
+  width: 66cqw;
+  border-radius: 1.4cqw;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.promo-web-stage-window .bmock-bar { height: 3cqw; padding: 0 1.4cqw; gap: 0.6cqw; }
+.promo-web-stage-window .bmock-bar i { width: 0.9cqw; height: 0.9cqw; }
+.promo-web-stage-window .bmock-bar span { font-size: 1.2cqw; margin-left: 1.6cqw; padding: 0.3cqw 1.4cqw; }
+.promo-web-stage-window .bmock-screen { aspect-ratio: 16 / 10; }
+.promo-web-stage:hover .promo-web-stage-window { transform: translateX(-1.5cqw); }
+
+@media (max-width: 759px) {
+  .promo-web-stage { aspect-ratio: 4 / 5; }
+  .promo-web-stage-copy { top: 7cqw; left: 7cqw; width: 86cqw; transform: none; gap: 2.4cqw; }
+  .promo-web-stage-copy .promo-brand { font-size: 4.4cqw; }
+  .promo-web-stage-copy strong { font-size: 7.6cqw; }
+  .promo-web-stage-copy > span:last-child { font-size: 3.6cqw; }
+  .promo-web-stage-window { left: 7cqw; top: 58cqw; width: 110cqw; }
+  .promo-web-stage-window .bmock-bar { height: 5cqw; }
+  .promo-web-stage-window .bmock-bar span { font-size: 2.2cqw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-window, .promo-web-stage-window { transition: none; }
+}

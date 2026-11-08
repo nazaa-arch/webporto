@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { projectDetails, type ProjectDetail as Project } from "./projects";
 import { PromoStage, PromoTile, thisMePromos, thisMeScreens } from "./MobileMock";
+import { WebPromoStage, WebPromoTile, webPromos } from "./WebPromo";
 
 const BASE = import.meta.env.BASE_URL;
 const img = (folder: string, file: string) => `${BASE}work/${folder}/${file}`;
@@ -133,6 +134,8 @@ export default function ProjectDetail({
               title="Sign language, made friendly"
               sub="A BISINDO learning app with video lessons, daily progress and camera practice."
             />
+          ) : webPromos[project.slug] ? (
+            <WebPromoStage set={webPromos[project.slug]} />
           ) : (
             <Frame project={project} file="cover.jpg" label={project.features[0].title} index={0} eager />
           )}
@@ -162,6 +165,8 @@ export default function ProjectDetail({
             <article className={`pd-feature ${i % 2 ? "flip" : ""}`} key={f.title}>
               {project.mobile ? (
                 <PromoTile promo={thisMePromos[i]} size="large" />
+              ) : webPromos[project.slug] ? (
+                <WebPromoTile set={webPromos[project.slug]} index={i} size="large" />
               ) : (
                 <Frame project={project} file={`${i + 1}.jpg`} label={f.title} index={i} />
               )}
