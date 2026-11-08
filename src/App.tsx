@@ -1,5 +1,121 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, Copy, Menu, X } from "lucide-react";
+import ProjectDetail, { projectHref } from "./ProjectDetail";
+import { findProject } from "./projects";
+
+/* -------------------------------------------------------------------------- */
+/*                      STEAMCRAFT + ECOSYSTEM APPS (REAL SCREENSHOTS)                    */
+/* -------------------------------------------------------------------------- */
+
+const steamcraftProjects: {
+  id: string;
+  sub: string;
+  slug: string;
+  folder: string;
+  domain: string;
+  name: string;
+  tags: string;
+  desc: string;
+  cta: string;
+  shots: [string, string, string];
+}[] = [
+  {
+    id: "project-hub",
+    sub: "hub",
+    slug: "steamcraft-hub",
+    folder: "hub",
+    domain: "steamcraft.online",
+    name: "STEAM Team Hub",
+    tags: "Brand & web design · Team Research Portal",
+    desc: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the SteamCraft platform to IoT and biotech prototypes.",
+    cta: "Visit the hub",
+    shots: ["Research Team Members", "Team Projects Gateway", "Research Pillars & Ecosystem"],
+  },
+  {
+    id: "project-02",
+    sub: "app",
+    slug: "steamcraft",
+    folder: "app",
+    domain: "app.steamcraft.online",
+    name: "SteamCraft Ecosystem",
+    tags: "Product design · Research Collaboration Platform",
+    desc: "A multidisciplinary research workspace for students and lecturers: five scientific checkpoints, PKM logbooks with PDF export, empirical data repositories and a five-axis STEAM competency radar.",
+    cta: "View platform",
+    shots: ["Workspace Sign-in", "Research Dashboard", "STEAM Competency Radar"],
+  },
+  {
+    id: "project-sim",
+    sub: "sim",
+    slug: "sim",
+    folder: "sim",
+    domain: "sim.steamcraft.online",
+    name: "SteamSim Lab",
+    tags: "Interactive simulation · Physics, Chemistry & Math",
+    desc: "A virtual science studio with projectile motion under air drag, acid-base titration and a chaotic double pendulum, plus sensor-noise data export to CSV.",
+    cta: "Open the lab",
+    shots: ["Projectile Motion", "Titration pH Curve", "Chaos Pendulum"],
+  },
+  {
+    id: "project-maker",
+    sub: "maker",
+    slug: "maker",
+    folder: "maker",
+    domain: "maker.steamcraft.online",
+    name: "MakerCraft 3D",
+    tags: "Generative art · WebGL Parametric Studio",
+    desc: "A mathematical art studio that renders parametric surfaces in real time, with tunable equations, material themes and 3D-print-ready OBJ export.",
+    cta: "Open the studio",
+    shots: ["Torus Knot · Cyberpunk", "Hologram Material", "Emerald Matrix Material"],
+  },
+  {
+    id: "project-verilab",
+    sub: "verilab",
+    slug: "verilab",
+    folder: "verilab",
+    domain: "verilab.steamcraft.online",
+    name: "VeriLab AI",
+    tags: "AI research tool · Scientific Reproducibility",
+    desc: "A metrology and reproducibility engine: sensor calibration with Gaussian Process Regression, paper-claim replication and Monte Carlo & Sobol sensitivity analysis.",
+    cta: "Open VeriLab",
+    shots: ["Calibration & GPR", "Replicability Check", "Monte Carlo & Sobol"],
+  },
+  {
+    id: "project-scholar",
+    sub: "scholar",
+    slug: "scholar",
+    folder: "scholar",
+    domain: "scholar.steamcraft.online",
+    name: "PaperCraft AI",
+    tags: "AI writing assistant · Academic UX",
+    desc: "An academic manuscript assistant that scores IMRaD structure against Scopus Q1/Q2 targets, with section word budgets, statistics checks and an AI audit.",
+    cta: "Open PaperCraft",
+    shots: ["IMRaD Manuscript Score", "Statistics Check", "AI Manuscript Audit"],
+  },
+  {
+    id: "project-geo",
+    sub: "geo",
+    slug: "geo",
+    folder: "geo",
+    domain: "geo.steamcraft.online",
+    name: "SteamGeo Intelligence",
+    tags: "Data visualisation · Spatial GIS Dashboard",
+    desc: "A dengue early-warning dashboard for 38 East Java regions, combining geographically weighted regression (GWR), LISA clusters and rainfall layers.",
+    cta: "Open the map",
+    shots: ["Dengue Incidence Map", "LISA Clusters", "Rainfall Layer"],
+  },
+  {
+    id: "project-arena",
+    sub: "arena",
+    slug: "arena",
+    folder: "arena",
+    domain: "arena.steamcraft.online",
+    name: "SteamArena",
+    tags: "Product design · Innovation Competition Platform",
+    desc: "A national STEAM hackathon arena with a project leaderboard, five-axis STEAM radar scoring and structured peer review.",
+    cta: "Open the arena",
+    shots: ["Project Leaderboard", "Peer-Review Scoring", "Category Filter"],
+  },
+];
 
 /* -------------------------------------------------------------------------- */
 /*              3D INTERACTIVE CARD CONTAINER (ZYXKOO.DEV STYLE)              */
@@ -143,9 +259,28 @@ function ShotCard3D({
 /*                              MAIN APP COMPONENT                            */
 /* -------------------------------------------------------------------------- */
 
-export default function App() {
+function Home({ onOpen }: { onOpen: (slug: string) => void }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // a project card opens its case study; real links/buttons inside keep their own job
+  const cardClick = (slug: string) => (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest("a, button")) return;
+    onOpen(slug);
+  };
+  const titleLink = (slug: string, name: string) => (
+    <a
+      className="work-title-link"
+      href={projectHref(slug)}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        onOpen(slug);
+      }}
+    >
+      {name}
+    </a>
+  );
 
   const heroRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -334,6 +469,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // every window/hero listener below is removed on unmount (route change)
+    const ac = new AbortController();
+    const signal = ac.signal;
     // -------------------------------------------------------------
     // 1. Nav scrolled toggle
     // -------------------------------------------------------------
@@ -343,7 +481,7 @@ export default function App() {
         nav.classList.toggle("scrolled", window.scrollY > 24);
       }
     };
-    window.addEventListener("scroll", onScrollNav, { passive: true });
+    window.addEventListener("scroll", onScrollNav, { passive: true, signal });
     onScrollNav();
 
     // -------------------------------------------------------------
@@ -542,11 +680,11 @@ export default function App() {
         updateFly();
       }
 
-      window.addEventListener("scroll", onScrollFly, { passive: true });
+      window.addEventListener("scroll", onScrollFly, { passive: true, signal });
       window.addEventListener("resize", () => {
         measureFly();
         updateFly();
-      });
+      }, { signal });
 
       // Pointermove smooth parallax for hero tiles
       const fine = window.matchMedia("(pointer:fine)").matches;
@@ -561,8 +699,8 @@ export default function App() {
           hero.style.setProperty("--mx", "0");
           hero.style.setProperty("--my", "0");
         };
-        hero.addEventListener("pointermove", onPointerMove);
-        hero.addEventListener("pointerleave", onPointerLeave);
+        hero.addEventListener("pointermove", onPointerMove, { signal });
+        hero.addEventListener("pointerleave", onPointerLeave, { signal });
       }
     }
 
@@ -642,7 +780,7 @@ export default function App() {
       };
 
       const arcTick = (t: number) => {
-        if (!arcOn) {
+        if (!arcOn || disposed) {
           arcLast = 0;
           return;
         }
@@ -660,7 +798,7 @@ export default function App() {
       window.addEventListener("resize", () => {
         arcSetup();
         arcRender();
-      });
+      }, { signal });
 
       if (!arcCalm) {
         window.addEventListener(
@@ -670,11 +808,11 @@ export default function App() {
             arcBoost = Math.min(500, arcBoost + Math.abs(y - arcLastY) * 3);
             arcLastY = y;
           },
-          { passive: true }
+          { passive: true, signal }
         );
 
         if ("IntersectionObserver" in window) {
-          new IntersectionObserver((entries) => {
+          const arcIo = new IntersectionObserver((entries) => {
             const vis = entries[0].isIntersecting;
             if (vis && !arcOn) {
               arcOn = true;
@@ -682,7 +820,9 @@ export default function App() {
             } else if (!vis) {
               arcOn = false;
             }
-          }).observe(arcView);
+          });
+          arcIo.observe(arcView);
+          signal.addEventListener("abort", () => arcIo.disconnect());
         } else {
           arcOn = true;
           requestAnimationFrame(arcTick);
@@ -718,7 +858,7 @@ export default function App() {
       window.addEventListener("resize", () => {
         setStick();
         updateStack();
-      });
+      }, { signal });
       window.addEventListener(
         "scroll",
         () => {
@@ -727,12 +867,13 @@ export default function App() {
             requestAnimationFrame(updateStack);
           }
         },
-        { passive: true }
+        { passive: true, signal }
       );
     }
 
     return () => {
       disposed = true;
+      ac.abort();
       introAnims.forEach((a) => a.cancel());
       window.removeEventListener("scroll", onScrollNav);
       if (arcCancel) cancelAnimationFrame(arcCancel);
@@ -959,7 +1100,7 @@ export default function App() {
           <div className="container wide">
             <div className="display-head reveal">
               <h2 className="display-title">
-                Selected works<sup className="display-count">(04)</sup>
+                Selected works<sup className="display-count">(11)</sup>
               </h2>
               <div className="display-sub-row">
                 <p className="display-sub">2024 – 2026</p>
@@ -988,11 +1129,11 @@ export default function App() {
 
             <div className="works-list">
               {/* Project 01: This Me */}
-              <div className="reveal" id="project-01">
+              <div className="reveal work-card-link" id="project-01" data-project="this-me" onClick={cardClick("this-me")}>
                 <Card3D maxTilt={7}>
                   <article className="work-row">
                     <div className="work-info">
-                      <h3>This Me</h3>
+                      <h3>{titleLink("this-me", "This Me")}</h3>
                       <p className="work-tags">Product design · Inclusive App Design</p>
                       <p className="work-desc">
                         An interactive Indonesian Sign Language (BISINDO) learning app featuring 30+ Figma
@@ -1031,56 +1172,63 @@ export default function App() {
                 </Card3D>
               </div>
 
-              {/* Project 02: SteamCraft */}
-              <div className="reveal" id="project-02">
-                <Card3D maxTilt={7}>
-                  <article className="work-row">
-                    <div className="work-info">
-                      <h3>SteamCraft Ecosystem</h3>
-                      <p className="work-tags">Product design · 3D Simulation &amp; Web App</p>
-                      <p className="work-desc">
-                        An interactive science simulation lab (SteamSim) and generative 3D modeling canvas
-                        (MakerCraft 3D) engineered with complex parameter workbench controls.
-                      </p>
-                      <a
-                        className="btn-secondary"
-                        href="https://portofolionaza.steamcraft.online"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View platform <ArrowRight size={15} />
-                      </a>
-                    </div>
-                    <div className="work-shots">
-                      <ShotCard3D>
-                        <div className="ph ph-2">
-                          <span>01 / SteamSim Lab</span>
-                          <strong>Physics &amp; Chemistry Studio</strong>
-                        </div>
-                      </ShotCard3D>
-                      <ShotCard3D>
-                        <div className="ph ph-alt-a">
-                          <span>02 / MakerCraft 3D</span>
-                          <strong>Generative Math 3D Canvas</strong>
-                        </div>
-                      </ShotCard3D>
-                      <ShotCard3D>
-                        <div className="ph ph-alt-b">
-                          <span>03 / Ecosystem</span>
-                          <strong>Multi-Subdomain Architecture</strong>
-                        </div>
-                      </ShotCard3D>
-                    </div>
-                  </article>
-                </Card3D>
-              </div>
+              {/* Project 02: SteamCraft + its six ecosystem apps (real screenshots) */}
+              {steamcraftProjects.map((proj) => (
+                <div
+                  className="reveal work-card-link"
+                  id={proj.id}
+                  key={proj.slug}
+                  data-project={proj.slug}
+                  onClick={cardClick(proj.slug)}
+                >
+                  <Card3D maxTilt={7}>
+                    <article className="work-row">
+                      <div className="work-info">
+                        <h3>{titleLink(proj.slug, proj.name)}</h3>
+                        <p className="work-tags">{proj.tags}</p>
+                        <p className="work-desc">{proj.desc}</p>
+                        <p className="eco-count">
+                          <span className="eco-dot" aria-hidden="true" />
+                          {proj.domain}
+                          {!["app", "hub"].includes(proj.sub) && <> &middot; SteamCraft Ecosystem</>}
+                        </p>
+                        <a
+                          className="btn-secondary"
+                          href={`https://${proj.domain}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {proj.cta} <ArrowRight size={15} />
+                        </a>
+                      </div>
+                      <div className="work-shots">
+                        {proj.shots.map((label, i) => (
+                          <ShotCard3D key={label} className="shot-media">
+                            <img
+                              className="shot-img"
+                              src={`${import.meta.env.BASE_URL}work/${proj.folder}/${i + 1}.jpg`}
+                              alt={`${proj.name}: ${label}`}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <span className="shot-tag">
+                              <span>0{i + 1}</span>
+                              <strong>{label}</strong>
+                            </span>
+                          </ShotCard3D>
+                        ))}
+                      </div>
+                    </article>
+                  </Card3D>
+                </div>
+              ))}
 
               {/* Project 03: A-KERE */}
-              <div className="reveal" id="project-03">
+              <div className="reveal work-card-link" id="project-03" data-project="a-kere" onClick={cardClick("a-kere")}>
                 <Card3D maxTilt={7}>
                   <article className="work-row">
                     <div className="work-info">
-                      <h3>A-KERE</h3>
+                      <h3>{titleLink("a-kere", "A-KERE")}</h3>
                       <p className="work-tags">App design · Fintech Mobile UX</p>
                       <p className="work-desc">
                         A streamlined personal budgeting application that cuts transaction logging steps by
@@ -1115,11 +1263,11 @@ export default function App() {
               </div>
 
               {/* Project 04: Naza Cell POS */}
-              <div className="reveal" id="project-04">
+              <div className="reveal work-card-link" id="project-04" data-project="naza-cell" onClick={cardClick("naza-cell")}>
                 <Card3D maxTilt={7}>
                   <article className="work-row">
                     <div className="work-info">
-                      <h3>Naza Cell POS</h3>
+                      <h3>{titleLink("naza-cell", "Naza Cell POS")}</h3>
                       <p className="work-tags">Product design · Enterprise Retail System</p>
                       <p className="work-desc">
                         High-efficiency cashier POS interface and multi-supplier inventory management platform
@@ -1224,6 +1372,15 @@ export default function App() {
           <section className="about" id="about">
             <div className="meet">
               <figure className="meet-photo">
+                <img
+                  className="meet-img"
+                  src={`${import.meta.env.BASE_URL}images/naza.jpg`}
+                  alt="Naza Firmansyah tersenyum dan berpose peace di depan Menara Eiffel, Paris"
+                  width={1924}
+                  height={2048}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <p className="meet-tag" aria-hidden="true">
                   <span>[Naza</span>
                   <span>Firmansyah]</span>
@@ -1455,4 +1612,54 @@ export default function App() {
       </main>
     </>
   );
+}
+
+/* -------------------------------------------------------------------------- */
+/*          ROUTER: home page, or a case study at ?project=<slug>             */
+/* -------------------------------------------------------------------------- */
+
+const BASE = import.meta.env.BASE_URL;
+const readSlug = () => new URLSearchParams(window.location.search).get("project");
+
+export default function App() {
+  const [slug, setSlug] = useState<string | null>(readSlug);
+  const returnTo = useRef<string | null>(null);
+  const slugRef = useRef(slug);
+  slugRef.current = slug;
+
+  useEffect(() => {
+    const onPop = () => {
+      const next = readSlug();
+      if (!next && slugRef.current) returnTo.current = slugRef.current;
+      setSlug(next);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  const navigate = (next: string | null) => {
+    if (next) {
+      window.history.pushState(null, "", projectHref(next));
+    } else {
+      returnTo.current = slugRef.current;
+      window.history.pushState(null, "", `${BASE}#work`);
+    }
+    setSlug(next);
+  };
+
+  // case study: start at the top; back home: land on the card you came from
+  useLayoutEffect(() => {
+    if (slug) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      return;
+    }
+    const from = returnTo.current;
+    returnTo.current = null;
+    if (from) {
+      document.querySelector(`[data-project="${from}"]`)?.scrollIntoView({ block: "center", behavior: "instant" });
+    }
+  }, [slug]);
+
+  const project = findProject(slug);
+  return project ? <ProjectDetail project={project} onNavigate={navigate} /> : <Home onOpen={navigate} />;
 }
