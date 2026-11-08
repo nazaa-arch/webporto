@@ -48,6 +48,28 @@ export const projectDetails: ProjectDetail[] = [
     ],
   },
   {
+    slug: "kelarify",
+    folder: null,
+    name: "Kelarify",
+    tags: "Client project · UI/UX & Web Design",
+    lead: "Contracted as UI/UX and web designer for Kelarify: the website's look and flow, built around an animated owl mascot and a deep-teal, warm-gold and green palette.",
+    overview: [
+      "Kelarify brought me in on contract to design its website. The visual direction centres on a friendly face: an owl in a varsity jacket, an animal linked to wisdom, drawn soft and approachable so the site feels supportive rather than formal.",
+      "The site pairs a deep-teal hero with warm-gold and green actions, a live order-queue preview card, trust points and key numbers, then flows into an about section, a service catalogue with filter tabs and an FAQ. Every section stacks into a thumb-friendly mobile layout.",
+    ],
+    highlights: ["Landing page", "Responsive mobile layout", "Service catalogue with filters", "Animated owl mascot", "Deep-teal & gold palette"],
+    meta: [
+      { label: "Role", value: "UI/UX & Web Designer" },
+      { label: "Engagement", value: "Contract / client project" },
+      { label: "Mascot motion", value: "AI-assisted (Gemini)" },
+    ],
+    features: [
+      { title: "Greeting Animation", text: "A ten-second loop where the owl waves, explains with a spark of ideas and celebrates, used to give the site a warm first impression." },
+      { title: "Landing Page", text: "A deep-teal hero with a clear headline, two primary actions and a live order-queue preview, followed by trust points, key numbers and a dark-teal section that explains how every client is handled." },
+      { title: "Mobile Layout", text: "On phones the layout stacks into full-width buttons, readable cards and a floating chat button, keeping every action within thumb reach." },
+    ],
+  },
+  {
     slug: "steamcraft-hub",
     folder: "hub",
     name: "STEAM Team Hub",

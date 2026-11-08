@@ -4,6 +4,7 @@ import ProjectDetail, { projectHref } from "./ProjectDetail";
 import { findProject } from "./projects";
 import { PromoTile, thisMePromos } from "./MobileMock";
 import { WebPromoTile, webPromos } from "./WebPromo";
+import { KelarifyTile } from "./KelarifyPromo";
 
 /* -------------------------------------------------------------------------- */
 /*                      STEAMCRAFT + ECOSYSTEM APPS (REAL SCREENSHOTS)                    */
@@ -963,7 +964,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           <div className="container wide">
             <div className="display-head reveal">
               <h2 className="display-title">
-                Selected works <span className="count-pill">11 projects</span>
+                Selected works <span className="count-pill">12 projects</span>
               </h2>
               <div className="display-sub-row">
                 <p className="display-sub">2024 – 2026</p>
@@ -1012,6 +1013,40 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                       {thisMePromos.map((promo) => (
                         <ShotCard3D key={promo.title} className="shot-promo">
                           <PromoTile promo={promo} />
+                        </ShotCard3D>
+                      ))}
+                    </div>
+                  </article>
+                </Card3D>
+              </div>
+
+              {/* Kelarify: brand mascot & identity (design only, no service link) */}
+              <div className="reveal work-card-link" id="project-kelarify" data-project="kelarify" onClick={cardClick("kelarify")}>
+                <Card3D maxTilt={7}>
+                  <article className="work-row">
+                    <div className="work-info">
+                      <h3>{titleLink("kelarify", "Kelarify")}</h3>
+                      <p className="work-tags">Client project · UI/UX &amp; Web Design</p>
+                      <p className="work-desc">
+                        Contracted as UI/UX and web designer for Kelarify: the website&rsquo;s look and flow,
+                        built around an animated owl mascot and a deep-teal, warm-gold and green palette.
+                      </p>
+                      <a
+                        className="btn-secondary"
+                        href={projectHref("kelarify")}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                          e.preventDefault();
+                          onOpen("kelarify");
+                        }}
+                      >
+                        View case study <ArrowRight size={15} />
+                      </a>
+                    </div>
+                    <div className="work-shots">
+                      {[0, 1, 2].map((i) => (
+                        <ShotCard3D key={i} className="shot-promo">
+                          <KelarifyTile index={i} />
                         </ShotCard3D>
                       ))}
                     </div>

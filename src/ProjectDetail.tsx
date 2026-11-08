@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { projectDetails, type ProjectDetail as Project } from "./projects";
 import { PromoStage, PromoTile, thisMePromos, thisMeScreens } from "./MobileMock";
 import { WebPromoStage, WebPromoTile, webPromos } from "./WebPromo";
+import { KelarifyStage, KelarifyTile } from "./KelarifyPromo";
 
 const BASE = import.meta.env.BASE_URL;
 const img = (folder: string, file: string) => `${BASE}work/${folder}/${file}`;
@@ -135,6 +136,8 @@ export default function ProjectDetail({
               title="Sign language, made friendly"
               sub="A BISINDO learning app with video lessons, daily progress and camera practice."
             />
+          ) : project.slug === "kelarify" ? (
+            <KelarifyStage />
           ) : webPromos[project.slug] ? (
             <WebPromoStage set={webPromos[project.slug]} />
           ) : (
@@ -166,6 +169,8 @@ export default function ProjectDetail({
             <article className={`pd-feature ${i % 2 ? "flip" : ""}`} key={f.title}>
               {project.mobile ? (
                 <PromoTile promo={thisMePromos[i]} size="large" />
+              ) : project.slug === "kelarify" ? (
+                <KelarifyTile index={i} size="large" />
               ) : webPromos[project.slug] ? (
                 <WebPromoTile set={webPromos[project.slug]} index={i} size="large" />
               ) : (
@@ -194,6 +199,8 @@ export default function ProjectDetail({
             <div className="pd-next-thumb" aria-hidden="true">
               {next.mobile ? (
                 <PromoTile promo={thisMePromos[0]} />
+              ) : next.slug === "kelarify" ? (
+                <KelarifyTile index={0} />
               ) : next.folder ? (
                 <img src={img(next.folder, "cover.jpg")} alt="" loading="lazy" decoding="async" />
               ) : (

@@ -2238,3 +2238,161 @@ a.tile:hover {
   background: #f59e0b;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
 }
+
+/* ==========================================================================
+   Kelarify client web-design posters (KelarifyPromo.tsx). Scoped, additive.
+   ========================================================================== */
+.promo.promo-kelarify {
+  --ink: #fff;
+  --muted: rgba(255, 255, 255, 0.74);
+  --accent: #d4a640;
+  background: radial-gradient(120% 90% at 82% 12%, #1d5a5e 0%, #062f3a 62%);
+}
+.promo-kelarify::after { background: rgba(138, 168, 58, 0.14); }
+.promo-kelarify .promo-copy { width: 52cqw; gap: 2cqw; }
+.promo-kelarify .promo-title { font-size: 6.4cqw; }
+.promo-kelarify .promo-sub { font-size: 3.2cqw; }
+.promo-kelarify .promo-chip.kel-chip { position: static; justify-self: start; margin-top: 1.2cqw; }
+.promo-kelarify .promo-chip.kel-chip::before { background: var(--accent); }
+.kel-1 .promo-copy { width: 54cqw; }
+.kel-2 .promo-copy { width: 42cqw; }
+
+/* tile 0: phone with the mascot animation */
+.kel-phone {
+  position: absolute;
+  right: 8cqw;
+  top: 10cqw;
+  width: 33cqw;
+  transform: rotate(4deg);
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.promo-kelarify:hover .kel-phone,
+.shot:hover .promo-kelarify .kel-phone { transform: rotate(0deg) translateY(-2cqw); }
+
+/* browser window (shares .bmock styles with the web posters) */
+.kel-window { position: absolute; }
+.kel-window-screen { aspect-ratio: 16 / 10; overflow: hidden; background: #062f3a; }
+.kel-window-screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+
+/* tile 1: two layered desktop windows */
+.kel-windows { position: absolute; inset: 0; }
+.kel-window-back {
+  left: 46cqw;
+  top: 43cqw;
+  width: 62cqw;
+  opacity: 0.85;
+  transform: rotate(-3deg);
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.kel-window-front {
+  left: 8cqw;
+  top: 47cqw;
+  width: 72cqw;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.promo-kelarify:hover .kel-window-front,
+.shot:hover .promo-kelarify .kel-window-front { transform: translateY(-2.5cqw); }
+.promo-kelarify:hover .kel-window-back,
+.shot:hover .promo-kelarify .kel-window-back { transform: rotate(-1deg) translateX(2cqw); }
+
+/* tile 2: two phones */
+.kel-phones { position: absolute; inset: 0; }
+.kel-phone-back,
+.kel-phone-front {
+  position: absolute;
+  width: 26cqw;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.kel-phone-back { right: 6cqw; top: 22cqw; transform: rotate(8deg); }
+.kel-phone-front { right: 30cqw; top: 40cqw; transform: rotate(-4deg); }
+.promo-kelarify:hover .kel-phone-front,
+.shot:hover .promo-kelarify .kel-phone-front { transform: rotate(0deg) translateY(-2cqw); }
+.promo-kelarify:hover .kel-phone-back,
+.shot:hover .promo-kelarify .kel-phone-back { transform: rotate(4deg) translateX(1cqw); }
+
+/* case-study cover */
+.kel-stage {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--r-lg);
+  background: radial-gradient(110% 100% at 75% 20%, #1d5a5e 0%, #062f3a 62%);
+  box-shadow: var(--shadow-3d);
+  color: #fff;
+  --accent: #d4a640;
+  --ink: #fff;
+}
+.kel-stage::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 40cqw;
+  height: 40cqw;
+  left: -10cqw;
+  bottom: -16cqw;
+  border-radius: 50%;
+  background: rgba(138, 168, 58, 0.16);
+}
+.kel-stage-copy {
+  position: absolute;
+  left: 6cqw;
+  top: 50%;
+  width: 32cqw;
+  transform: translateY(-50%);
+  display: grid;
+  gap: 1.6cqw;
+}
+.kel-kicker {
+  font-size: 1.5cqw;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+.kel-stage-copy .promo-brand { font-size: 2.4cqw; }
+.kel-stage-copy strong { font-size: 4.6cqw; line-height: 1.06; font-weight: 700; letter-spacing: -0.035em; }
+.kel-stage-copy > span:last-child { font-size: 1.7cqw; line-height: 1.5; color: rgba(255, 255, 255, 0.75); }
+.kel-stage-art { position: absolute; inset: 0; }
+.kel-stage-window {
+  left: 41cqw;
+  top: 10cqw;
+  width: 54cqw;
+  border-radius: 1.4cqw;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.kel-stage-window .bmock-bar { height: 3cqw; padding: 0 1.4cqw; gap: 0.6cqw; }
+.kel-stage-window .bmock-bar i { width: 0.9cqw; height: 0.9cqw; }
+.kel-stage-window .bmock-bar span { font-size: 1.2cqw; margin-left: 1.6cqw; padding: 0.3cqw 1.4cqw; }
+.kel-stage-phone {
+  position: absolute;
+  left: 82cqw;
+  top: 26cqw;
+  width: 14cqw;
+  z-index: 2;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.kel-stage:hover .kel-stage-window { transform: translateX(-1.5cqw); }
+.kel-stage:hover .kel-stage-phone { transform: translateY(-1.5cqw); }
+
+.pd-next-thumb .promo-kelarify { aspect-ratio: auto; height: 100%; }
+.pd-next-thumb .promo-kelarify .promo-sub,
+.pd-next-thumb .promo-kelarify .promo-chip { display: none; }
+
+@media (max-width: 759px) {
+  .kel-stage { aspect-ratio: 4 / 5; }
+  .kel-stage-copy { top: 7cqw; left: 7cqw; width: 86cqw; transform: none; gap: 2.4cqw; }
+  .kel-kicker { font-size: 3cqw; }
+  .kel-stage-copy .promo-brand { font-size: 4.4cqw; }
+  .kel-stage-copy strong { font-size: 8cqw; }
+  .kel-stage-copy > span:last-child { font-size: 3.6cqw; }
+  .kel-stage-window { left: 7cqw; top: 66cqw; width: 98cqw; }
+  .kel-stage-window .bmock-bar { height: 5cqw; }
+  .kel-stage-window .bmock-bar span { font-size: 2.2cqw; }
+  .kel-stage-phone { left: 66cqw; top: 54cqw; width: 26cqw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kel-phone, .kel-window-front, .kel-window-back, .kel-phone-front, .kel-phone-back,
+  .kel-stage-window, .kel-stage-phone { transition: none; }
+}
