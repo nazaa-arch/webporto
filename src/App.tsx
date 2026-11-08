@@ -29,7 +29,7 @@ const steamcraftProjects: {
     domain: "steamcraft.online",
     name: "STEAM Team Hub",
     tags: "Brand & web design · Team Research Portal",
-    desc: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the live SteamCraft platform to IoT and biotech projects in development.",
+    desc: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the SteamCraft platform prototype to IoT and biotech projects in development.",
     cta: "Visit the hub",
     shots: ["Research Team Members", "Team Projects Gateway", "Research Pillars & Ecosystem"],
   },
@@ -41,7 +41,7 @@ const steamcraftProjects: {
     domain: "app.steamcraft.online",
     name: "SteamCraft Ecosystem",
     tags: "Product design · Research Collaboration Platform",
-    desc: "A multidisciplinary research workspace for students and lecturers: five scientific checkpoints, PKM logbooks with PDF export, empirical data repositories and a five-axis STEAM competency radar.",
+    desc: "A multidisciplinary research workspace for students and lecturers: five scientific checkpoints, research logbooks with PDF export, empirical data repositories and a five-axis STEAM competency radar.",
     cta: "View platform",
     shots: ["Workspace Sign-in", "Research Dashboard", "STEAM Competency Radar"],
   },
@@ -128,7 +128,7 @@ const explorations = [
   { label: "SteamSim Lab", title: "Virtual Science Simulation", meta: "sim.steamcraft.online", tone: "teal" },
   { label: "MakerCraft 3D", title: "Parametric 3D Art Studio", meta: "maker.steamcraft.online", tone: "pink" },
   { label: "A-KERE Finance", title: "Frictionless Expense Logging", meta: "Mobile prototyping", tone: "amber" },
-  { label: "Cyberbullying NLP", title: "93% Accuracy Model", meta: "3,000+ text datasets", tone: "indigo" },
+  { label: "Cyberbullying NLP", title: ">88% Accuracy, 7 Classes", meta: "1,100+ posts from Instagram & X", tone: "indigo" },
   { label: "Spatial Dengue GWR", title: "East Java Geodata Science", meta: "Geographic regression", tone: "green" },
 ];
 
@@ -914,8 +914,8 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
             {/* Tile 4 */}
             <div className="tile t4">
               <div className="ph ph-4">
-                <span>04 / GEMASTIK XVIII</span>
-                <strong>Finalis UX Design</strong>
+                <span>04 / NLP Research</span>
+                <strong>2 Manuscripts in Prep</strong>
               </div>
             </div>
 
@@ -931,7 +931,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
             <div className="tile t6">
               <div className="ph ph-6">
                 <span>06 / UNESA Sains Data</span>
-                <strong>GPA 3.80 / 4.00</strong>
+                <strong>Data Science, 2024&ndash;now</strong>
               </div>
             </div>
           </div>
@@ -972,19 +972,16 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                     <span className="flag" role="listitem" style={{ "--i": 0 } as React.CSSProperties} data-name="Medali Perak DIMAS TI">
                       🥈
                     </span>
-                    <span className="flag" role="listitem" style={{ "--i": 1 } as React.CSSProperties} data-name="Finalis GEMASTIK XVIII">
-                      🏆
-                    </span>
-                    <span className="flag" role="listitem" style={{ "--i": 2 } as React.CSSProperties} data-name="UNESA Sains Data GPA 3.80">
+                    <span className="flag" role="listitem" style={{ "--i": 1 } as React.CSSProperties} data-name="UNESA Sains Data">
                       🎓
                     </span>
-                    <span className="flag" role="listitem" style={{ "--i": 3 } as React.CSSProperties} data-name="PUSPRESNAS OSN 2x">
+                    <span className="flag" role="listitem" style={{ "--i": 2 } as React.CSSProperties} data-name="PUSPRESNAS OSN 2x">
                       🏅
                     </span>
                   </div>
                   <p className="clients-caption">
-                    <strong>National UI/UX Recognition</strong>
-                    <span>Validated by design competitions</span>
+                    <strong>National Silver Medal</strong>
+                    <span>DIMAS TI 2025 &middot; UI/UX</span>
                   </p>
                 </div>
               </div>
@@ -1038,8 +1035,9 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                         <p className="work-tags">{proj.tags}</p>
                         <p className="work-desc">{proj.desc}</p>
                         <p className="eco-count">
-                          <span className="eco-dot" aria-hidden="true" />
+                          <span className={`eco-dot ${proj.sub === "hub" ? "" : "proto"}`} aria-hidden="true" />
                           {proj.domain}
+                          {proj.sub !== "hub" && <> &middot; Prototype</>}
                           {!["app", "hub"].includes(proj.sub) && <> &middot; SteamCraft Ecosystem</>}
                         </p>
                         <a
@@ -1244,7 +1242,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                       I turn complex data and user needs into intuitive digital products.
                     </p>
                     <p>
-                      Sebagai mahasiswa Sains Data di Universitas Negeri Surabaya (IPK 3.80), saya bekerja
+                      Sebagai mahasiswa Sains Data di Universitas Negeri Surabaya, saya bekerja
                       pada persimpangan antara logika analitik data kuantitatif dan empati desain manusia &mdash;
                       mentransformasi gagasan awal menjadi antarmuka intuitif dan produk yang terukur.
                     </p>

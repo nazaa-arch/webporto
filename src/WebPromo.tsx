@@ -110,7 +110,7 @@ export const webPromos: Record<string, WebSet> = {
     { title: "Build skills, create solutions, make an impact", sub: "The official portal of a three-person STEAM research team." },
     [
       ["Research team members", "Three innovators, one research team", "Software, IoT hardware & research design", "3 team members"],
-      ["Team projects gateway", "Every team project in one gateway", "Live platform plus projects in development"],
+      ["Team projects gateway", "Every team project in one gateway", "Platform prototype plus projects in development"],
       ["Research pillars", "Four pillars behind every project", "Methodology, FAIR data, instruments & dossiers"],
     ]
   ),
@@ -136,7 +136,7 @@ export const webPromos: Record<string, WebSet> = {
     { name: ["MakerCraft ", "3D"], bg: "linear-gradient(150deg, #b0248f 0%, #5b1270 75%)", accent: "#ffb3ec", url: "maker.steamcraft.online", folder: "maker" },
     { title: "Equations you can hold in 3D", sub: "Parametric surfaces rendered live and ready for 3D printing." },
     [
-      ["Torus knot in cyberpunk material", "Equations you can hold in 3D", "Parametric surfaces rendered live", "Ready for 3D print"],
+      ["Torus knot in cyberpunk material", "Equations you can hold in 3D", "Parametric surfaces rendered live", "3D-print export"],
       ["Hologram material", "One shape, endless looks", "Switch material themes instantly"],
       ["Emerald matrix material", "From formula to printable model", "Export any surface as .OBJ"],
     ]

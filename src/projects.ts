@@ -52,12 +52,12 @@ export const projectDetails: ProjectDetail[] = [
     folder: "hub",
     name: "STEAM Team Hub",
     tags: "Brand & web design · Team Research Portal",
-    lead: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the live SteamCraft platform to IoT and biotech projects still in development.",
+    lead: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the SteamCraft platform prototype to IoT and biotech projects still in development.",
     overview: [
       "steamcraft.online is the main domain of the STEAM research team. Under the motto Learn, Create, Impact, it introduces the team, its visual identity and every collaborative research initiative in one place.",
-      "The hub connects the flagship SteamCraft platform, already live, with the team's next projects that are currently in development: an IoT marine buoy for coral-reef monitoring and an organic, biodegradable mycelium battery. It also links each member to their own portfolio.",
+      "The hub connects the flagship SteamCraft platform, currently a working prototype, with the team's next projects that are currently in development: an IoT marine buoy for coral-reef monitoring and an organic, biodegradable mycelium battery. It also links each member to their own portfolio.",
     ],
-    highlights: ["Team visual identity", "3 member profile cards", "SteamCraft platform: live", "IoT Marine Buoy: in development", "Mycobattery: in development"],
+    highlights: ["Team visual identity", "3 member profile cards", "SteamCraft platform: prototype", "IoT Marine Buoy: in development", "Mycobattery: in development"],
     meta: [
       { label: "Role", value: "Project lead & lead system architect" },
       { label: "Team", value: "3 members" },
@@ -66,7 +66,7 @@ export const projectDetails: ProjectDetail[] = [
     link: { href: "https://steamcraft.online", label: "Visit the hub", display: "steamcraft.online" },
     features: [
       { title: "Research Team Members", text: "ID-card style profiles for the three team members, each with their role, division, skills and a link to their personal portfolio." },
-      { title: "Team Projects Gateway", text: "Filterable project cards with each project's status: the SteamCraft platform is live, while the IoT Marine Buoy and the EcoBiosynthesis Mycobattery are still in development." },
+      { title: "Team Projects Gateway", text: "Filterable project cards with each project's status: the SteamCraft platform is a working prototype, while the IoT Marine Buoy and the EcoBiosynthesis Mycobattery are still in development." },
       { title: "Research Pillars & Ecosystem", text: "Four research pillars, from scientific methodology to FAIR data and smart instrumentation, plus direct entry points to the specialist apps." },
     ],
   },
@@ -75,18 +75,18 @@ export const projectDetails: ProjectDetail[] = [
     folder: "app",
     name: "SteamCraft Ecosystem",
     tags: "Product design · Research Collaboration Platform",
-    lead: "A multidisciplinary research workspace for students and lecturers: five scientific checkpoints, PKM logbooks with PDF export, empirical data repositories and a five-axis STEAM competency radar.",
+    lead: "A multidisciplinary research workspace for students and lecturers: five scientific checkpoints, research logbooks with PDF export, empirical data repositories and a five-axis STEAM competency radar.",
     overview: [
       "SteamCraft is the main hub of a multi-app research ecosystem. It gives students and lecturers one workspace to plan cross-disciplinary projects, collect empirical evidence, run controlled simulations and assemble scientific reports ready for verification.",
       "Every project moves through five scientific checkpoints with logbooks, data repositories and lecturer consultations, while a five-axis STEAM radar turns each student's work into a readable competency portfolio.",
     ],
-    highlights: ["5 scientific checkpoints", "PKM logbook & PDF export", "Student & lecturer roles", "STEAM competency radar", "Hub for 6 connected apps"],
+    highlights: ["5 scientific checkpoints", "Research logbook & PDF export", "Student & lecturer roles", "STEAM competency radar", "Hub for 6 connected apps"],
     meta: [
       { label: "Role", value: "Product design & development" },
       { label: "Platform", value: "Web app" },
-      { label: "Status", value: "Live" },
+      { label: "Status", value: "Prototype" },
     ],
-    link: { href: "https://app.steamcraft.online", label: "Visit live app", display: "app.steamcraft.online" },
+    link: { href: "https://app.steamcraft.online", label: "Try the prototype", display: "app.steamcraft.online" },
     features: [
       { title: "Workspace Sign-in", text: "Role-based entry for students and lecturers, with one-click demo accounts so judges and testers can explore without registering." },
       { title: "Research Dashboard", text: "An overview of active projects, checkpoint progress, collaborators and blockers, plus a four-step onboarding mission for first-time users." },
@@ -107,9 +107,9 @@ export const projectDetails: ProjectDetail[] = [
     meta: [
       { label: "Role", value: "Lead developer & designer" },
       { label: "Platform", value: "Web app" },
-      { label: "Status", value: "Live" },
+      { label: "Status", value: "Prototype" },
     ],
-    link: { href: "https://sim.steamcraft.online", label: "Open the lab", display: "sim.steamcraft.online" },
+    link: { href: "https://sim.steamcraft.online", label: "Try the prototype", display: "sim.steamcraft.online" },
     features: [
       { title: "Projectile Motion", text: "Launch a projectile with quadratic air drag and tune speed, angle, drag, mass and sensor noise while range, peak height, flight time and impact speed update live." },
       { title: "Titration pH Curve", text: "Simulate an acid-base titration and watch the pH curve bend around the equivalence point as the titrant volume changes." },
@@ -130,9 +130,9 @@ export const projectDetails: ProjectDetail[] = [
     meta: [
       { label: "Role", value: "Lead developer & designer" },
       { label: "Platform", value: "Web app (WebGL)" },
-      { label: "Status", value: "Live" },
+      { label: "Status", value: "Prototype" },
     ],
-    link: { href: "https://maker.steamcraft.online", label: "Open the studio", display: "maker.steamcraft.online" },
+    link: { href: "https://maker.steamcraft.online", label: "Try the prototype", display: "maker.steamcraft.online" },
     features: [
       { title: "Torus Knot · Cyberpunk", text: "Frequency, twist, tube radius and mesh resolution sliders reshape a torus knot instantly, rendered with GPU shading." },
       { title: "Hologram Material", text: "Switch material themes to explore the same geometry with a completely different look." },
@@ -153,9 +153,9 @@ export const projectDetails: ProjectDetail[] = [
     meta: [
       { label: "Role", value: "Developer & designer" },
       { label: "Platform", value: "Web app" },
-      { label: "Status", value: "Live" },
+      { label: "Status", value: "Prototype" },
     ],
-    link: { href: "https://verilab.steamcraft.online", label: "Open VeriLab", display: "verilab.steamcraft.online" },
+    link: { href: "https://verilab.steamcraft.online", label: "Try the prototype", display: "verilab.steamcraft.online" },
     features: [
       { title: "Calibration & GPR", text: "Calibrate a sensor by fitting its readings with Gaussian Process Regression and a 95% confidence band." },
       { title: "Replicability Check", text: "Enter the metrics a paper reports, add the experiment script and run seeded sandbox runs to see whether the claims replicate." },
@@ -176,9 +176,9 @@ export const projectDetails: ProjectDetail[] = [
     meta: [
       { label: "Role", value: "Developer & designer" },
       { label: "Platform", value: "Web app" },
-      { label: "Status", value: "Live" },
+      { label: "Status", value: "Prototype" },
     ],
-    link: { href: "https://scholar.steamcraft.online", label: "Open PaperCraft", display: "scholar.steamcraft.online" },
+    link: { href: "https://scholar.steamcraft.online", label: "Try the prototype", display: "scholar.steamcraft.online" },
     features: [
       { title: "IMRaD Manuscript Score", text: "Write the abstract, introduction, methods, results and discussion in separate tabs while a readiness score out of 100 tracks the whole paper." },
       { title: "Statistics Check", text: "Reviews the reported statistics and highlights which results still need stronger support." },
@@ -199,9 +199,9 @@ export const projectDetails: ProjectDetail[] = [
     meta: [
       { label: "Role", value: "Data science & design" },
       { label: "Platform", value: "Web dashboard" },
-      { label: "Status", value: "Live" },
+      { label: "Status", value: "Prototype" },
     ],
-    link: { href: "https://geo.steamcraft.online", label: "Open the map", display: "geo.steamcraft.online" },
+    link: { href: "https://geo.steamcraft.online", label: "Try the prototype", display: "geo.steamcraft.online" },
     features: [
       { title: "Dengue Incidence Map", text: "A choropleth map of dengue incidence per 100,000 people, with a region panel showing rainfall, temperature, cases and population." },
       { title: "LISA Clusters", text: "Local spatial autocorrelation groups regions into clusters to reveal where outbreaks concentrate." },
@@ -222,9 +222,9 @@ export const projectDetails: ProjectDetail[] = [
     meta: [
       { label: "Role", value: "Product design & development" },
       { label: "Platform", value: "Web app" },
-      { label: "Status", value: "Live" },
+      { label: "Status", value: "Prototype" },
     ],
-    link: { href: "https://arena.steamcraft.online", label: "Open the arena", display: "arena.steamcraft.online" },
+    link: { href: "https://arena.steamcraft.online", label: "Try the prototype", display: "arena.steamcraft.online" },
     features: [
       { title: "Project Leaderboard", text: "Top projects ranked by STEAM score, each with its team, category badge, axis scores and upvotes." },
       { title: "Peer-Review Scoring", text: "Reviewers rate scientific accuracy, innovation, engineering and design on clear sliders before sending their score." },

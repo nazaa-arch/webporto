@@ -113,6 +113,7 @@ export default function ProjectDetail({
                   <dt>{m.label}</dt>
                   <dd>
                     {m.value === "Live" && <span className="eco-dot" aria-hidden="true" />}
+                    {m.value === "Prototype" && <span className="eco-dot proto" aria-hidden="true" />}
                     {m.value}
                   </dd>
                 </div>
