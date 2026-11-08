@@ -40,7 +40,6 @@ export const projectDetails: ProjectDetail[] = [
       { label: "Platform", value: "Mobile app" },
       { label: "Usability", value: "SUS 92.5" },
     ],
-    link: { href: "https://github.com/nazaa-arch/webporto", label: "View work", display: "github.com/nazaa-arch" },
     features: [
       { title: "Animated Loading Screen", text: "Two signing hands come together to form the This Me logo, setting a warm, friendly tone before the first lesson begins." },
       { title: "Learning Home", text: "Daily progress at the top, four learning tracks for the alphabet, numbers, phrases and conversation, workplace signs below and the camera always one tap away." },

@@ -1002,11 +1002,14 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                       </p>
                       <a
                         className="btn-secondary"
-                        href="https://github.com/nazaa-arch/webporto"
-                        target="_blank"
-                        rel="noreferrer"
+                        href={projectHref("this-me")}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                          e.preventDefault();
+                          onOpen("this-me");
+                        }}
                       >
-                        View work <ArrowRight size={15} />
+                        View case study <ArrowRight size={15} />
                       </a>
                     </div>
                     <div className="work-shots">
@@ -1123,7 +1126,15 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                         A streamlined personal budgeting application that cuts transaction logging steps by
                         50% through rapid-input flow and visual cash flow distribution.
                       </p>
-                      <a className="btn-secondary" href="#contact">
+                      <a
+                        className="btn-secondary"
+                        href={projectHref("a-kere")}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                          e.preventDefault();
+                          onOpen("a-kere");
+                        }}
+                      >
                         View case study <ArrowRight size={15} />
                       </a>
                     </div>
@@ -1162,8 +1173,16 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                         High-efficiency cashier POS interface and multi-supplier inventory management platform
                         handling 100+ SKUs and continuous daily financial transactions.
                       </p>
-                      <a className="btn-secondary" href="#contact">
-                        View system <ArrowRight size={15} />
+                      <a
+                        className="btn-secondary"
+                        href={projectHref("naza-cell")}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                          e.preventDefault();
+                          onOpen("naza-cell");
+                        }}
+                      >
+                        View case study <ArrowRight size={15} />
                       </a>
                     </div>
                     <div className="work-shots">
