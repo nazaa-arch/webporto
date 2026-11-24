@@ -2175,12 +2175,15 @@ a.tile:hover {
   overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s ease;
 }
-.explore-card::before {
+.explore-label::before {
   content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
   background: var(--tone);
+  vertical-align: 1px;
 }
 .explore-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 .tone-blue { --tone: #1066ff; }
@@ -2395,4 +2398,25 @@ a.tile:hover {
 @media (prefers-reduced-motion: reduce) {
   .kel-phone, .kel-window-front, .kel-window-back, .kel-phone-front, .kel-phone-back,
   .kel-stage-window, .kel-stage-phone { transition: none; }
+}
+
+/* ---------- personal MNF logo ---------- */
+.nav-logo-mark {
+  display: block;
+  height: 34px;
+  width: auto;
+  filter: drop-shadow(0 2px 6px rgba(16, 102, 255, 0.18));
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.4s ease;
+}
+.nav-logo:hover .nav-logo-mark {
+  transform: translateY(-1px) rotate(-3deg) scale(1.04);
+  filter: drop-shadow(0 6px 14px rgba(16, 102, 255, 0.3));
+}
+.footer-brand { display: inline-flex; align-items: center; gap: 12px; }
+.footer-logo { height: 28px; width: auto; opacity: 0.9; }
+@media (max-width: 759px) {
+  .nav-logo-mark { height: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-logo-mark { transition: none; }
 }

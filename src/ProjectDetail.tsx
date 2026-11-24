@@ -84,10 +84,7 @@ export default function ProjectDetail({
     <div className="pd" key={project.slug}>
       <header className="nav scrolled pd-nav">
         <a className="nav-logo" href={BASE} onClick={go(null)}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" strokeDasharray="9.6 4.54" strokeDashoffset="-2.27" />
-            <path d="M12 8v8M8 12h8" />
-          </svg>
+          <img className="nav-logo-mark" src={`${BASE}brand/logo-mnf.png`} alt="" width={360} height={150} decoding="async" />
           <span>Naza Firmansyah</span>
         </a>
         <a className="btn-secondary pd-back-top" href={`${BASE}#work`} onClick={go(null)}>

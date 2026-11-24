@@ -47,6 +47,44 @@ export const projectDetails: ProjectDetail[] = [
     ],
   },
   {
+    slug: "smawh2",
+    folder: "smawh2",
+    name: "SMA Wachid Hasyim 2 Taman",
+    tags: "Client project · School Web Platform, Custom CMS & Portal Redesign",
+    lead: "End-to-end redesign and full-stack rebuild of SMA Wachid Hasyim 2 Taman's official website (smawh2.sch.id) and Laravel SPMB admissions portal (ppdb.smawh2.sch.id) with a custom drag-and-drop CMS.",
+    overview: [
+      "Replaced a slow, Elementor-based WordPress site with a lightweight, mobile-first PHP 8.3 and MySQL platform hosted on Hostinger LiteSpeed — preserving all legacy WordPress archives and school subdomains (ujian, diakad, ppdb) with zero downtime.",
+      "Built a tailored no-code admin panel featuring a 13-section drag-and-drop landing page builder, direct image upload, multi-category news publishing with a visual WYSIWYG editor, and an optional Google Sheets webhook integration for SPMB leads, alongside a unified visual redesign of the active Laravel 8 admissions portal.",
+    ],
+    highlights: [
+      "PHP 8.3 + MySQL custom CMS",
+      "13-section drag-and-drop page builder",
+      "Multi-category news & WYSIWYG editor",
+      "Laravel 8 PPDB portal visual redesign",
+      "WebP optimization & structured SEO",
+    ],
+    meta: [
+      { label: "Role", value: "UI/UX & Full-Stack Web Developer" },
+      { label: "Client", value: "SMA Wachid Hasyim 2 Taman" },
+      { label: "Status", value: "Live" },
+    ],
+    link: { href: "https://smawh2.sch.id", label: "Visit live site", display: "smawh2.sch.id" },
+    features: [
+      {
+        title: "Official School Website",
+        text: "A fast, mobile-first school hub in navy and gold with WebP imagery, interactive extracurricular filters, a gallery lightbox, dynamic news archive (/berita), and JSON-LD school SEO.",
+      },
+      {
+        title: "Drag-and-Drop CMS & Multi-Category News",
+        text: "A WordPress-free admin panel where school staff reorder or toggle all 13 landing-page sections via drag & drop, edit text and photos without code, and publish multi-category articles with a visual WYSIWYG editor.",
+      },
+      {
+        title: "SPMB Admissions Portal Redesign",
+        text: "Unified visual redesign of the live Laravel 8 admissions portal (ppdb.smawh2.sch.id) across the home page, 693-school Select2 registration form, student login, and admin login with zero disruption to active applicants.",
+      },
+    ],
+  },
+  {
     slug: "kelarify",
     folder: null,
     name: "Kelarify",

@@ -767,17 +767,14 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
       {/* -------------------- HEADER / NAV -------------------- */}
       <header className="nav" id="nav" ref={navRef}>
         <a className="nav-logo" href="#top">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="9" strokeDasharray="9.6 4.54" strokeDashoffset="-2.27" />
-            <path d="M12 8v8M8 12h8" />
-          </svg>
+          <img
+            className="nav-logo-mark"
+            src={`${import.meta.env.BASE_URL}brand/logo-mnf.png`}
+            alt=""
+            width={360}
+            height={150}
+            decoding="async"
+          />
           <span>Naza Firmansyah</span>
         </a>
 
@@ -964,7 +961,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           <div className="container wide">
             <div className="display-head reveal">
               <h2 className="display-title">
-                Selected works <span className="count-pill">12 projects</span>
+                Selected works <span className="count-pill">13 projects</span>
               </h2>
               <div className="display-sub-row">
                 <p className="display-sub">2024 – 2026</p>
@@ -1016,6 +1013,59 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                       {thisMePromos.map((promo) => (
                         <ShotCard3D key={promo.title} className="shot-promo">
                           <PromoTile promo={promo} />
+                        </ShotCard3D>
+                      ))}
+                    </div>
+                  </article>
+                </Card3D>
+              </div>
+
+              {/* Client Project: SMA Wachid Hasyim 2 Taman (live website, custom CMS & PPDB portal redesign) */}
+              <div className="reveal work-card-link" id="project-smawh2" data-project="smawh2" onClick={cardClick("smawh2")}>
+                <Card3D maxTilt={7}>
+                  <article className="work-row">
+                    <div className="work-info">
+                      <h3>{titleLink("smawh2", "SMA Wachid Hasyim 2 Taman")}</h3>
+                      <p className="work-tags">Client project · School Web Platform, Custom CMS &amp; Portal Redesign</p>
+                      <p className="work-desc">
+                        End-to-end redesign and rebuild of the school&rsquo;s official website (smawh2.sch.id) and
+                        Laravel SPMB admissions portal (ppdb.smawh2.sch.id), complete with a custom 13-section
+                        drag-and-drop page builder and multi-category news CMS.
+                      </p>
+                      <p className="eco-count">
+                        <span className="eco-dot" aria-hidden="true" />
+                        smawh2.sch.id &middot; ppdb.smawh2.sch.id &middot; Live
+                      </p>
+                      <a
+                        className="btn-secondary"
+                        href={projectHref("smawh2")}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                          e.preventDefault();
+                          onOpen("smawh2");
+                        }}
+                      >
+                        View case study <ArrowRight size={15} />
+                      </a>
+                    </div>
+                    <div className="work-shots">
+                      {[
+                        "Official School Website",
+                        "Drag-and-Drop CMS",
+                        "SPMB Admissions Portal",
+                      ].map((label, i) => (
+                        <ShotCard3D key={label} className="shot-media">
+                          <img
+                            className="shot-img"
+                            src={`${import.meta.env.BASE_URL}work/smawh2/${i + 1}.jpg`}
+                            alt={`SMA Wachid Hasyim 2 Taman: ${label}`}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <span className="shot-tag">
+                            <span>0{i + 1}</span>
+                            <strong>{label}</strong>
+                          </span>
                         </ShotCard3D>
                       ))}
                     </div>
@@ -1485,7 +1535,18 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
             </div>
 
             <footer className="footer">
-              <span>&copy; {new Date().getFullYear()} Muhammad Naza Firmansyah</span>
+              <span className="footer-brand">
+                <img
+                  className="footer-logo"
+                  src={`${import.meta.env.BASE_URL}brand/logo-mnf.png`}
+                  alt="MNF logo"
+                  width={360}
+                  height={150}
+                  loading="lazy"
+                  decoding="async"
+                />
+                &copy; {new Date().getFullYear()} Muhammad Naza Firmansyah
+              </span>
               <a href="#top">
                 Back to top <ArrowUpRight size={16} />
               </a>
