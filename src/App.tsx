@@ -888,50 +888,89 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           </div>
 
           <div className="tiles">
-            {/* Tile 1 */}
-            <div className="tile t1">
-              <PromoTile promo={thisMePromos[0]} />
-            </div>
+            {/* Tile 1: This Me */}
+            <a
+              href={projectHref("this-me")}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                onOpen("this-me");
+              }}
+              className="tile t1"
+              aria-label="This Me project"
+            >
+              <PromoTile promo={thisMePromos[0]} num="01 / " />
+            </a>
 
-            {/* Tile 2 */}
-            <div className="tile t2">
-              <div className="ph ph-2">
-                <span>02 / SteamSim Lab</span>
-                <strong>Interactive 3D Sim</strong>
-              </div>
-            </div>
+            {/* Tile 2: SteamSim Lab */}
+            <a
+              href={projectHref("sim")}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                onOpen("sim");
+              }}
+              className="tile t2"
+              aria-label="SteamSim Lab project"
+            >
+              {webPromos.sim && <WebPromoTile set={webPromos.sim} index={0} num="02 / " />}
+            </a>
 
-            {/* Tile 3 */}
-            <div className="tile t3">
-              <div className="ph ph-3">
-                <span>03 / DIMAS TI 2025</span>
-                <strong>Medali Perak UI/UX</strong>
-              </div>
-            </div>
+            {/* Tile 3: Kelarify */}
+            <a
+              href={projectHref("kelarify")}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                onOpen("kelarify");
+              }}
+              className="tile t3"
+              aria-label="Kelarify project"
+            >
+              {webPromos.kelarify && <WebPromoTile set={webPromos.kelarify} index={0} num="03 / " />}
+            </a>
 
-            {/* Tile 4 */}
-            <div className="tile t4">
-              <div className="ph ph-4">
-                <span>04 / NLP Research</span>
-                <strong>2 Manuscripts in Prep</strong>
-              </div>
-            </div>
+            {/* Tile 4: MakerCraft 3D */}
+            <a
+              href={projectHref("maker")}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                onOpen("maker");
+              }}
+              className="tile t4"
+              aria-label="MakerCraft 3D project"
+            >
+              {webPromos.maker && <WebPromoTile set={webPromos.maker} index={0} num="04 / " />}
+            </a>
 
-            {/* Tile 5 */}
-            <div className="tile t5">
-              <div className="ph ph-5">
-                <span>05 / A-KERE</span>
-                <strong>Smart Finance Flow</strong>
-              </div>
-            </div>
+            {/* Tile 5: SMA Wachid Hasyim 2 */}
+            <a
+              href={projectHref("smawh2")}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                onOpen("smawh2");
+              }}
+              className="tile t5"
+              aria-label="SMA Wachid Hasyim 2 project"
+            >
+              {webPromos.smawh2 && <WebPromoTile set={webPromos.smawh2} index={0} num="05 / " />}
+            </a>
 
-            {/* Tile 6 */}
-            <div className="tile t6">
-              <div className="ph ph-6">
-                <span>06 / UNESA Sains Data</span>
-                <strong>Data Science, 2024&ndash;now</strong>
-              </div>
-            </div>
+            {/* Tile 6: SteamGeo Intelligence */}
+            <a
+              href={projectHref("geo")}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                onOpen("geo");
+              }}
+              className="tile t6"
+              aria-label="SteamGeo Intelligence project"
+            >
+              {webPromos.geo && <WebPromoTile set={webPromos.geo} index={0} num="06 / " />}
+            </a>
           </div>
 
           <h1 className="hero-title">

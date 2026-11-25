@@ -1372,7 +1372,7 @@ a.tile:hover {
   }
   .hero-lines i:nth-child(1), .hero-lines i:nth-child(3) { display: none; }
   .hero-links, .sel-box, .collab-cursor { display: none; }
-  .tiles { display: flex; justify-content: center; gap: 12px; width: 100%; }
+  .tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 100%; }
   .tile { position: relative; inset: auto; translate: none; }
   .hero-title { padding: 0; font-size: clamp(34px, 10.5vw, 56px); }
   .hero-title span { display: inline; }
@@ -1899,6 +1899,53 @@ a.tile:hover {
 .tile .promo-sub,
 .tile .promo-chip { display: none; }
 .tile .promo-phone { top: 9cqw; right: 7cqw; width: 30cqw; }
+
+/* Web promo tile inside hero tile */
+.tile .promo-web .promo-copy {
+  top: 8.5cqw;
+  left: 7cqw;
+  width: 48cqw;
+  gap: 2.2cqw;
+}
+.tile .promo-web .promo-brand {
+  font-size: 5.6cqw;
+}
+.tile .promo-web .promo-title {
+  font-size: 7.2cqw;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tile .promo-web .promo-window {
+  position: absolute;
+  top: 9cqw;
+  right: -5cqw;
+  left: auto;
+  width: 53cqw;
+  border-radius: 2.4cqw;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  transform: rotate(2deg);
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.tile:hover .promo-web .promo-window {
+  transform: rotate(0deg) translateY(-2cqw) scale(1.03);
+}
+
+.promo-num {
+  font-size: 0.9em;
+  font-weight: 500;
+  opacity: 0.7;
+  margin-right: 0.25em;
+  letter-spacing: -0.02em;
+}
+
+a.tile {
+  text-decoration: none;
+  cursor: pointer;
+  display: block;
+}
 
 /* case study: rounded large tiles */
 .promo-large { border-radius: var(--r-lg); box-shadow: var(--shadow-3d); }

@@ -48,11 +48,12 @@ export type Promo = {
 };
 
 /** One screen on a brand stage: headline left, phone rising from the bottom right. */
-export function PromoTile({ promo, size = "card" }: { promo: Promo; size?: "card" | "large" }) {
+export function PromoTile({ promo, size = "card", num }: { promo: Promo; size?: "card" | "large"; num?: string }) {
   return (
     <div className={`promo promo-${promo.tone} promo-${size}`}>
       <div className="promo-copy">
         <span className="promo-brand">
+          {num && <span className="promo-num">{num}</span>}
           This <b>Me</b>
         </span>
         <strong className="promo-title">{promo.title}</strong>

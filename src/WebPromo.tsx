@@ -23,9 +23,10 @@ type WebSet = { theme: WebTheme; promos: [WebPromo, WebPromo, WebPromo]; cover: 
 
 const vars = (t: WebTheme) => ({ "--promo-bg": t.bg, "--accent": t.accent }) as CSSProperties;
 
-function Brand({ theme }: { theme: WebTheme }) {
+function Brand({ theme, num }: { theme: WebTheme; num?: string }) {
   return (
     <span className="promo-brand">
+      {num && <span className="promo-num">{num}</span>}
       {theme.name[0]}
       <b>{theme.name[1]}</b>
     </span>
@@ -49,13 +50,13 @@ function BrowserMock({ src, alt, url, className = "", eager = false }: { src: st
 }
 
 /** One screen (shot n = 1..3) on the brand stage. */
-export function WebPromoTile({ set, index, size = "card" }: { set: WebSet; index: number; size?: "card" | "large" }) {
+export function WebPromoTile({ set, index, size = "card", num }: { set: WebSet; index: number; size?: "card" | "large"; num?: string }) {
   const { theme } = set;
   const p = set.promos[index];
   return (
     <div className={`promo promo-web promo-${size}`} style={vars(theme)}>
       <div className="promo-copy">
-        <Brand theme={theme} />
+        <Brand theme={theme} num={num} />
         <strong className="promo-title">{p.title}</strong>
         <span className="promo-sub">{p.sub}</span>
       </div>
@@ -175,6 +176,24 @@ export const webPromos: Record<string, WebSet> = {
       ["Project leaderboard", "Where the best STEAM projects compete", "National STEAM innovation hackathon", "Top score 93"],
       ["Peer-review scoring", "Fair scores from structured peer review", "Rate accuracy, innovation & design"],
       ["Category filter", "Every track, one arena", "AI, simulation, geospatial, 3D & IoT"],
+    ]
+  ),
+  kelarify: set(
+    { name: ["Kelar", "ify"], bg: "linear-gradient(150deg, #0e444e 0%, #062228 75%)", accent: "#f5c042", url: "kelarify.com", folder: "kelarify" },
+    { title: "Friendly mascot, trusted web design", sub: "Contracted UI/UX designer: landing page, mobile flow & owl mascot." },
+    [
+      ["Landing page hero", "Friendly mascot, trusted service", "Deep-teal hero with animated owl mascot & order queue", "UI/UX Contract"],
+      ["Service catalogue", "Order queue & service catalogue", "Filter tabs, pricing tiers and trust badges"],
+      ["Mobile experience", "Thumb-friendly mobile flow", "Responsive mobile layout designed in Figma"],
+    ]
+  ),
+  smawh2: set(
+    { name: ["SMAWH ", "2"], bg: "linear-gradient(150deg, #182e6d 0%, #0d1a42 75%)", accent: "#f3c054", url: "smawh2.sch.id", folder: "smawh2" },
+    { title: "School Web Platform, Custom CMS & SPMB Portal", sub: "Fast PHP 8.3 website, 13-section drag-and-drop builder, and Laravel 8 portal redesign." },
+    [
+      ["Official school website", "Official School Web Platform", "Fast, mobile-first school hub with dynamic news and extracurriculars", "Live site"],
+      ["Drag-and-drop CMS", "Drag-and-Drop Landing Page CMS", "Tailored WordPress-free admin panel with WYSIWYG editor", "13 sections"],
+      ["SPMB admissions portal", "SPMB Admissions Portal Redesign", "Unified visual redesign across registration, student & admin login", "Laravel 8"],
     ]
   ),
 };
