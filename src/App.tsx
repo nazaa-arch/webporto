@@ -29,8 +29,8 @@ const steamcraftProjects: {
     folder: "hub",
     domain: "steamcraft.online",
     name: "STEAM Team Hub",
-    tags: "Brand & web design · Team Research Portal",
-    desc: "The official hub of a three-person multidisciplinary research team: visual identity, member profiles and a gateway to the team's projects, from the SteamCraft platform prototype to IoT and biotech projects in development.",
+    tags: "Student research lab · Non-Commercial Team Portal",
+    desc: "The hub of a three-student multidisciplinary research team & lab: member profiles, research pillars, and a gateway to our non-commercial academic prototypes (from the SteamCraft workspace to IoT and biotech experiments).",
     cta: "Visit the hub",
     shots: ["Research Team Members", "Team Projects Gateway", "Research Pillars & Ecosystem"],
   },
@@ -41,7 +41,7 @@ const steamcraftProjects: {
     folder: "app",
     domain: "app.steamcraft.online",
     name: "SteamCraft Ecosystem",
-    tags: "Product design · Research Collaboration Platform",
+    tags: "Research lab prototype · Academic Collaboration",
     desc: "A multidisciplinary research workspace for students and lecturers: five scientific checkpoints, research logbooks with PDF export, empirical data repositories and a five-axis STEAM competency radar.",
     cta: "View platform",
     shots: ["Workspace Sign-in", "Research Dashboard", "STEAM Competency Radar"],
@@ -792,7 +792,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span>SteamCraft</span>
+            <span>Data &amp; AI Portfolio</span>
             <ArrowUpRight size={15} />
           </a>
           <button
@@ -821,7 +821,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
           rel="noopener noreferrer"
           onClick={() => setMobileMenuOpen(false)}
         >
-          <span>SteamCraft Ecosystem</span>
+          <span>Data &amp; AI Portfolio</span>
           <ArrowUpRight size={15} />
         </a>
       </div>
@@ -1257,7 +1257,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                   <article className="work-row">
                     <div className="work-info">
                       <h3>{titleLink("naza-cell", "Naza Cell POS")}</h3>
-                      <p className="work-tags">Product design · Enterprise Retail System</p>
+                      <p className="work-tags">Product design · Retail POS System</p>
                       <p className="work-desc">
                         High-efficiency cashier POS interface and multi-supplier inventory management platform
                         handling 100+ SKUs and continuous daily financial transactions.
@@ -1556,7 +1556,7 @@ function Home({ onOpen }: { onOpen: (slug: string) => void }) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      SteamCraft <ArrowUpRight size={12} />
+                      Data &amp; AI Portfolio <ArrowUpRight size={12} />
                     </a>
                   </div>
                 </div>

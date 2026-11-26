@@ -108,7 +108,7 @@ const set = (
 export const webPromos: Record<string, WebSet> = {
   "steamcraft-hub": set(
     { name: ["STEAM ", "Hub"], bg: "linear-gradient(150deg, #2b3fb8 0%, #18256e 75%)", accent: "#a8c4ff", url: "steamcraft.online", folder: "hub" },
-    { title: "Build skills, create solutions, make an impact", sub: "The official portal of a three-person STEAM research team." },
+    { title: "Build skills, create solutions, make an impact", sub: "Non-commercial portal of a three-student STEAM research team & lab." },
     [
       ["Research team members", "Three innovators, one research team", "Software, IoT hardware & research design", "3 team members"],
       ["Team projects gateway", "Every team project in one gateway", "Platform prototype plus projects in development"],
